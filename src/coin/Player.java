@@ -39,12 +39,16 @@ public class Player {
         System.out.println("\n이전 블럭의 해쉬값 : "+ BlockChain.blockchain.get(BlockChain.blockchain.size() - 1).hash);
         Block block = new Block(BlockChain.blockchain.get(BlockChain.blockchain.size() - 1).hash);
         System.out.println("\n"+ this.name+ "의 코인 총량 : " + this.wallet.getBalance());
-        System.out.println("\n"+ this.name+ "의 지갑에서 "+ to.name+" 지갑으로 "+value+"의 코인 전송 시도 중...");
+        System.out.println("\n"+ this.name+ "의 지갑에서 "+ to.name+" 지갑으로 "+value+" 코인 전송 시도 중...");
         block.addTransaction(wallet.sendFunds(to.wallet.publicKey,value)); // 송금
         BlockChain.addBlock(block);
         System.out.println("\n"+ this.name + "의 코인 총량 : " + this.wallet.getBalance());
         System.out.println("\n"+ to.name +"의 코인 총량 : " + to.wallet.getBalance());
         BlockChain.isChainValid();
+    }
+    
+    public void setCharacter() {
+    	
     }
 
     public float getBalance(){
