@@ -48,37 +48,29 @@ public class CharacterChain {
         // 조상을 봐야함
         // 몇대를 선택할건지.. 이거 그냥 확률로 먼저 정해 어떤애를 볼건지를 딱 정해
     	// 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트
-    	makeCharacter("101000100101001011011010000");
-    	makeCharacter("111001010111110110100001011");
-    	makeCharacter("101000101011100111010000011");
-    	makeCharacter("111001010011110000101011000");
-    	makeCharacter("101000110001010011010010010");
-    	makeCharacter("111001000010101101100101011");
-    	makeCharacter("101000100101001010011010000");
-    	makeCharacter("111001011110010110100100111");
-    	makeCharacter("101000001100000000010100110");
-    	makeCharacter("111001110001110111100001000");
-    	makeCharacter("101000100101001011011010010");
-    	makeCharacter("111001010011110110100101011");
-    	makeCharacter("101000101001011011010110110");
-    	makeCharacter("111001010111110110100001001");
-    	makeCharacter("101000101001001011011010101");
-    	makeCharacter("111001010110110100110001011");
+    	makeCharacter("111110011111111111111111111111111111111111111111111111111111111111111111111");
+    	makeCharacter("111010011101110111011011111110111111101111111011011111110111111101111111010");
+    	makeCharacter("101110011001100110010011111100111111001111110010011111100111111001111110011");
+    	makeCharacter("101010010001000100000011111000111110001111100000011111000111110001111100010");
+    	makeCharacter("110110011011101110110111110000111100001111000010111110000111100001111000001");
+    	makeCharacter("110010010011001100100111100000111000001110000000111100000111000001110000010");
+    	makeCharacter("100110010111011101101111000000110000001100000001111000000110000001100000000");
+    	makeCharacter("100010001110111011101010000000100000001000000001010000000100000001000000011");
     }
     
     public static void breedTest() {
-       for(int i = 0; i < 8; i++) {
+       for(int i = 0; i < 4; i++) {
     	   breeding(blockchain.get(2*i)._Id,blockchain.get(2*i+1)._Id);
        }
-       for(int i = 8; i < 12; i++) {
+       for(int i = 4; i < 6; i++) {
     	   breeding(blockchain.get(2*i)._Id,blockchain.get(2*i+1)._Id);
        }
-       for(int i = 12; i < 14; i++) {
+       for(int i = 6; i < 7; i++) {
     	   breeding(blockchain.get(2*i)._Id,blockchain.get(2*i+1)._Id);
        }
-       for(int i = 14; i < 15; i++) {
-    	   breeding(blockchain.get(2*i)._Id,blockchain.get(2*i+1)._Id);
-       }
+//       for(int i = 14; i < 15; i++) {
+//    	   breeding(blockchain.get(2*i)._Id,blockchain.get(2*i+1)._Id);
+//       }
     }
     
     public static void makeCharacter(String dna) {

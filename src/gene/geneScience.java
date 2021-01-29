@@ -30,96 +30,70 @@ public class geneScience {
        String[] babyArray = new String[traitNum];
        
        for(int trait = 0; trait<traitNum; trait++) {
-          String momTrait = sliceTrait(momGene, trait);
-          String papaTrait = sliceTrait(papaGene, trait);
-          System.out.println(trait + " 엄마 : " + momTrait);
-          System.out.println(trait + " 아빠 : " + papaTrait);
+    	   System.out.println();
+    	   System.out.println(trait + " 특성");
           // 성별 유전
           String babyGene = "";
-          if(trait==0) {
-             String momSexGene[] = new String[2];
-             String papaSexGene[] = new String[2];
-             
-             for(int i=0; i<=2; i+=2) {
-                momSexGene[i/2] = momTrait.substring(i, i+2);
-                papaSexGene[i/2] = papaTrait.substring(i, i+2);
-             }
-             if(momSexGene[1].charAt(0) == papaSexGene[1].charAt(0)) {
-                System.out.println("성별 같음. 교배 불가");
-                return "";
-             }
-             // 유전 돌려~~
-             babyGene = momSexGene[random.nextInt(2)] + papaSexGene[random.nextInt(2)];
+          if(trait < 2) {
+        	  String momTrait = sliceTrait(momGene, trait);
+              String papaTrait = sliceTrait(papaGene, trait);
+              System.out.println(trait + " 엄마 : " + momTrait);
+              System.out.println(trait + " 아빠 : " + papaTrait);
+              // 성별
+              if(trait == 0) {
+            	  String momSexGene[] = new String[2];
+                  String papaSexGene[] = new String[2];
+                  
+                  for(int i=0; i<=2; i+=2) {
+                     momSexGene[i/2] = momTrait.substring(i, i+2);
+                     papaSexGene[i/2] = papaTrait.substring(i, i+2);
+                  }
+//                  if(momSexGene[1].charAt(0) == papaSexGene[1].charAt(0)) {
+//                     System.out.println("성별 같음. 교배 불가");
+//                     return "";
+//                  }
+                  // 유전 돌려~~
+                  babyGene = momSexGene[random.nextInt(2)] + papaSexGene[random.nextInt(2)];
+              }
+              // 종족 (그대로 유전, 엄마/아빠 같은 종족임)
+              else {
+            	  if(!momTrait.equals(papaTrait)) {
+                      System.out.println("종족 다름. 교배 불가");
+                      return "";
+                   }
+                   babyGene = momTrait;
+              }
           }
-          // 종족 (그대로 유전, 엄마/아빠 같은 종족임)
-          else if(trait==1) {
-             if(!momTrait.equals(papaTrait)) {
-                System.out.println("종족 다름. 교배 불가");
-                return "";
-             }
-             babyGene = momTrait;
-          }
-          //재료 유전
-          else if(trait >= 2 && trait <= 4) {
-             // 조상 살펴야지유
-             String genes[] = new String[2];
-             for(int j=0; j<2; j++){
-                String dna = findAncestors(j, j==0 ? momId : papaId, momTrait, papaTrait);
-                if(dna == "") {
-                   j--;
-                   continue;
-                }
-                genes[j] = dna;
-                }
-             babyGene = genes[random.nextInt(2)];
-          }
-          //눈 형태
-          else if(trait == 5) {
-             //균등교배
-             // 조상 살펴야지유
-             String genes[] = new String[2];
-             for(int j=0; j<2; j++){
-                String dna = findAncestors(j, j==0 ? momId : papaId, momTrait, papaTrait);
-                if(dna == "") {
-                   j--;
-                   continue;
-                }
-                genes[j] = dna;
-                }
-             babyGene = crossover(genes[0], genes[1]);
-          }
-          //눈, 몸통 색상
-          else if((trait >= 6 && trait <= 8) || (trait >= 10 && trait <=12)) {
-             String genes[] = new String[2];
-             for(int j=0; j<2; j++){
-                String dna = findAncestors(j, j==0 ? momId : papaId, momTrait, papaTrait);
-                if(dna == "") {
-                   j--;
-                   continue;
-                }
-                genes[j] = dna;
-                }
-             int[] colorRange = new int[2];
-             for(int i=0; i<2; i++) {
-                colorRange[i] = Integer.valueOf(genes[i], 2);
-             }
-             Arrays.sort(colorRange);
-             int colorGene = random.nextInt(colorRange[1]-colorRange[0])+colorRange[0];
-             babyGene = String.format("%08d", Integer.parseInt(Integer.toBinaryString(colorGene)));
-          }
-          //코,입
-          else if(trait == 9 || trait == 13) {
-             // 조상 살펴야지유
-             String genes[] = new String[2];
-             for(int j=0; j<2; j++){
-                String dna = findAncestors(j, j==0 ? momId : papaId, momTrait, papaTrait);
-                if(dna == "") {
-                   j--;
-                   continue;
-                }
-                genes[j] = dna;
-                }
-             babyGene = crossover(genes[0], genes[1]);
+          else {
+        	// 조상 살펴야지유
+              String genes[] = new String[2];
+              for(int j=0; j<2; j++){
+                 String dna = findAncestors(j, j==0 ? momId : papaId, momGene, papaGene);
+                 if(dna == "") {
+                    j--;
+                    continue;
+                 }
+                 genes[j] = sliceTrait(dna, trait);
+                 System.out.println((j==0 ? "엄마" : "아빠")+"(조상) 유전자 : " + genes[j]);
+                 }
+              // 재료 유전
+              if(trait >= 2 && trait <= 4) {
+            	  babyGene = genes[random.nextInt(2)];
+              }
+              // 눈, 코/입, 열성
+              else if(trait == 5 || trait == 9 || trait == 13) {
+            	  babyGene = crossover(genes[0], genes[1]);
+              }
+              // 색상 (눈, 몸통)
+              else {
+            	  int[] colorRange = new int[2];
+                  for(int i=0; i<2; i++) {
+                     colorRange[i] = Integer.valueOf(genes[i], 2);
+                  }
+                  Arrays.sort(colorRange);
+                  int colorGene = random.nextInt(colorRange[1]-colorRange[0])+colorRange[0];
+                  babyGene = String.format("%08d", Integer.parseInt(Integer.toBinaryString(colorGene)));
+              }
           }
           System.out.println("아기 유전자 : " +babyGene);
           
@@ -130,13 +104,13 @@ public class geneScience {
        return (mutationPer >= random.nextDouble() ? mutation(babyResult) : babyResult);
     }
 
-    public String findAncestors(int who, String whoId, String momTrait, String papaTrait) {
+    public String findAncestors(int who, String whoId, String momGene, String papaGene) {
        int ancestorRand = random.nextInt(7) % 8;
         ancestorRand = isExtended(ancestorRand); // -1 ~ 2
         System.out.println(who+"(0:엄마, 1:아빠) 조상 : " + ancestorRand );
         if(ancestorRand == -1) {
-           if(who == 0) {return momTrait;}
-           else {return papaTrait;}
+           if(who == 0) {return momGene;}
+           else {return papaGene;}
         }
         // 조상 필요
         int[] anc = {-1, -1, -1};
