@@ -1,5 +1,7 @@
 package coin;
 
+import java.util.ArrayList;
+
 public class Player {
 
     public Wallet wallet; // wallet of player
@@ -9,6 +11,7 @@ public class Player {
     private String pw; // pw for login
     private float stone; // game money for reinforce (?)
     public int hasCharacterNum;
+    public ArrayList<Character> characterList = new ArrayList<Character>();
 
     private boolean _isAdmin = false;
 
