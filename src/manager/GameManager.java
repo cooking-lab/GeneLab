@@ -10,18 +10,18 @@ public class GameManager {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		// db manager 호출
-
-
+		init();
+		DM.test();
 	}
 	
 	public static void init() {
-		BlockChain.init(); // BC 모듈 활성화
-		DatabaseManager DM = new DatabaseManager();
+		//BlockChain.init(); // BC 모듈 활성화
+		DM = new DatabaseManager();
 	}
 	
 	public static String makeCharacter(String DNA) {
 		init();
-		DM.uploadCharacterChain();
+		DM.loadCharacterChain();
 		String newCharacterJson = CharacterChain.makeCharacter(DNA);
 		DM.insertCharacterChain();
 		return newCharacterJson;
@@ -29,9 +29,9 @@ public class GameManager {
 	
 	public static String doBreeding(String mamaId, String papaId) {
 		init();
-		DM.uploadCharacterChain();
+		DM.loadCharacterChain();
 		String babyJson = CharacterChain.breeding(mamaId, papaId);
-		DM.insertCharacterChain();
+		DM.insertCharacterChain();		
 		return babyJson;
 	}
 }

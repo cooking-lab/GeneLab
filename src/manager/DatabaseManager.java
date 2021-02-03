@@ -6,7 +6,11 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import character.Character;
 import character.CharacterChain;
 import coin.Block;
@@ -48,24 +52,27 @@ public class DatabaseManager {
         mongoClient = new MongoClient(geneLabDatabaseUri);
 	}
 	
-	public void uploadCharacterChain() {
+	// DB로부터 로딩 -> 알고리즘 진행 -> DB 업데이트.
+	public void loadCharacterChain() {
 		// CharacterChain		
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
-        MongoCollection<Document> collection = database.getCollection("ChainList"); // get Collection
+        MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
         
-       if(collection.count() == 0) return;
+       if(chainListCollection.count() == 0) return;
         
-		FindIterable<Document> iterDoc = collection.find().projection(fields(include("CharacterChain"), excludeId()));
-	    MongoCursor<Document> dbc = iterDoc.iterator();        
+       		// ---------------------
+    		// about CharacterChain 
+    		// ---------------------
+       
+		FindIterable<Document> iterDocChain = chainListCollection.find().projection(fields(include("CharacterChain"), excludeId()));
+	    MongoCursor<Document> mapCursorChain = iterDocChain.iterator();        
 	        
-	    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-	    JSONObject jObject = new JSONObject(dbc.next().toJson());
-	    JSONArray jArray = jObject.getJSONArray("CharacterChain");
+	    JSONObject jObjectChain = new JSONObject(mapCursorChain.next().toJson());
+	    JSONArray jArrayChain = jObjectChain.getJSONArray("CharacterChain");
 	    //Type typeList = new TypeToken<ArrayList<Character>>(){}.getType();
 	        
-	    for(int i = 0; i < jArray.length(); i++) {
-	        	JSONObject obj = jArray.getJSONObject(i);
-	            //Character array = gson.fromJson(obj.toString(), Character.class);
+	    for(int i = 0; i < jArrayChain.length(); i++) {
+	        	JSONObject obj = jArrayChain.getJSONObject(i);
 	        	System.out.println(i + "번째 : " + obj);
 	        	String hash = obj.getString("_hash");
 	        	String previousHash = obj.getString("_previousHash");
@@ -79,6 +86,10 @@ public class DatabaseManager {
 	        	int ownerId = obj.getInt("_ownerId");
 	        	Character temp = new Character(hash,previousHash,timeStamp,nonce,DNA,mamaId,papaId,id,gen,ownerId);
 	        	CharacterChain.blockchain.add(temp);
+	        	CharacterChain.findCharacter.put(id, temp);	        	
+	        	String[] parentsId = {mamaId, papaId};
+	        	if(mamaId != "" && papaId != "")
+	        		CharacterChain.parents.put(id, parentsId);
 	        	System.out.println(hash);
 	        	System.out.println(previousHash);
 	        	System.out.println(timeStamp);
@@ -90,26 +101,83 @@ public class DatabaseManager {
 	        	System.out.println(gen);
 	        	System.out.println(ownerId);
 	    }
-	    collection.deleteOne(new Document("ChainFilter","ChainFilter"));
+	    
+	    chainListCollection.deleteOne(new Document("ChainFilter","CharacterChain"));
+	    	    
+	    	// --------------------------------------------------
+	 		// about mapList(finding parent for breeding) 
+	 		// --------------------------------------------------    
+	    
+        MongoCollection<Document> mapListCollection = database.getCollection("MapList"); // get Collection
+        if(mapListCollection.count() == 0) return;
+        mapListCollection.deleteOne(new Document("findCharacterFilter", "findCharacterMap"));
+        mapListCollection.deleteOne(new Document("findParentsFilter", "findParentsMap"));        
+
 	}
 	
+	
 	public void insertCharacterChain() {
-		// CharacterChain		
+		
+		// --------------------------------------------------
+		// about CharacterChain Database
+		// --------------------------------------------------
+		
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
-        MongoCollection<Document> collection = database.getCollection("ChainList"); // get Collection
-        
-        System.out.println(collection.count());
-        //if(collection.count() != 0)
-        //	updateCharacterChain();
-        
+        MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
+                
         String characterChainString = new GsonBuilder().setPrettyPrinting().create().toJson(CharacterChain.blockchain);
         Object characterChainJson = JSON.parse(characterChainString);
 
         Document characterChainDocument = new Document("CharacterChain", characterChainJson);        
-        characterChainDocument.append("ChainFilter", "ChainFilter");
+        characterChainDocument.append("ChainFilter", "CharacterChain");
 
-        collection.insertOne(characterChainDocument);       
+        chainListCollection.insertOne(characterChainDocument);       
+             
+		// --------------------------------------------------
+		// about mapList(finding parent for breeding) Database
+		// --------------------------------------------------        
 
+        MongoCollection<Document> mapListCollection = database.getCollection("MapList"); 
+
+        // Save MapList 
+        List<Document> mapLists= new ArrayList<>();        
+        
+        // add findCharacter Map
+        int i = 0;
+    	JSONArray allCharacter = new JSONArray();
+        for(Entry<String, Character> kv : CharacterChain.findCharacter.entrySet()) {
+        	JSONObject inputData = new JSONObject();
+        	inputData.put("_id", kv.getKey());
+        	inputData.put("_character", kv.getValue());
+        	allCharacter.put(i, inputData);
+        	i++;
+        }
+        String findCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(allCharacter);
+        Object findCharacterJson= JSON.parse(findCharacterString);
+        Document findCharacterDoc = new Document("findCharacterMap", findCharacterJson);
+        findCharacterDoc.append("findCharacterFilter", "findCharacterMap");
+        mapLists.add(findCharacterDoc);
+        
+        // add findParents Map
+        int j = 0;
+        JSONArray allParents = new JSONArray();
+        for(Entry<String, String[]> kv : CharacterChain.parents.entrySet()) {
+        	JSONObject inputData = new JSONObject();
+        	inputData.put("_babyId", kv.getKey());
+        	inputData.put("_parents", kv.getValue());
+        	allParents.put(j,inputData);
+        	j++;
+        }
+        String findParentsString = new GsonBuilder().setPrettyPrinting().create().toJson(allParents);
+        Object findParentsJson = JSON.parse(findParentsString);
+        Document findParentsDoc = new Document("findParentsMap",findParentsJson);
+        findParentsDoc.append("findParentsFilter", "findParentsMap");
+        mapLists.add(findParentsDoc);
+                
+        // save List
+        mapListCollection.insertMany(mapLists);
+        
+        // 큰 루틴
         // 1. DB에서 불러오기 (필터) o
         // 2. Chain 변수에 저장해 
         // 3. 새 캐릭터 만들어서 체인에 추가해
@@ -128,22 +196,22 @@ public class DatabaseManager {
 		
 	}
 	
-	public void delete() {
+	public void deleteObject() {
 		
 	}
 	
-	public void find() {
+	public void findObject() {
 		
 	}
 	
-	public void init() {
+	public void initObject() {
 		
 	}
 
 	public void test() {
-	               
-        uploadCharacterChain();
-        CharacterChain.test();        
+        loadCharacterChain();
+        //CharacterChain.test();
+        CharacterChain.breedTest();
         insertCharacterChain();
 	}	
 }
