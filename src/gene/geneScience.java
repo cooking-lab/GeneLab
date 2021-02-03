@@ -90,8 +90,8 @@ public class geneScience {
                   for(int i=0; i<2; i++) {
                      colorRange[i] = Integer.valueOf(genes[i], 2);
                   }
-                  Arrays.sort(colorRange);
-                  int colorGene = random.nextInt(colorRange[1]-colorRange[0])+colorRange[0];
+                  Arrays.sort(colorRange); 
+                  int colorGene = (colorRange[0] == colorRange[1]) ? colorRange[0] : random.nextInt(colorRange[1]-colorRange[0])+colorRange[0];
                   babyGene = String.format("%08d", Integer.parseInt(Integer.toBinaryString(colorGene)));
               }
           }

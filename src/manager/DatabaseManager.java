@@ -45,6 +45,7 @@ public class DatabaseManager {
 	
 	private MongoClientURI geneLabDatabaseUri; // 접근
 	private MongoClient mongoClient; // client
+	public boolean hasData = true;
 	
 	DatabaseManager(){
 		geneLabDatabaseUri = new MongoClientURI(
@@ -58,10 +59,13 @@ public class DatabaseManager {
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
         MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
         
-       if(chainListCollection.count() == 0) return;
+       if(chainListCollection.count() == 0) {
+           hasData = false;
+           return;
+       }
         
        		// ---------------------
-    		// about CharacterChain 
+    		// about CharacterChain & Map
     		// ---------------------
        
 		FindIterable<Document> iterDocChain = chainListCollection.find().projection(fields(include("CharacterChain"), excludeId()));
@@ -102,17 +106,23 @@ public class DatabaseManager {
 	        	System.out.println(ownerId);
 	    }
 	    
-	    chainListCollection.deleteOne(new Document("ChainFilter","CharacterChain"));
-	    	    
-	    	// --------------------------------------------------
-	 		// about mapList(finding parent for breeding) 
-	 		// --------------------------------------------------    
+	}
+	
+	public void deleteCharacterChain() {
+		// 필터 사용시 deleteOne을 하게되면 필터에 해당하는 가장 앞쪽 Data가 지워진다.
+		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
+        MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
+        
+		chainListCollection.deleteOne(new Document("ChainFilter","CharacterChain"));
 	    
-        MongoCollection<Document> mapListCollection = database.getCollection("MapList"); // get Collection
-        if(mapListCollection.count() == 0) return;
-        mapListCollection.deleteOne(new Document("findCharacterFilter", "findCharacterMap"));
-        mapListCollection.deleteOne(new Document("findParentsFilter", "findParentsMap"));        
-
+    	// --------------------------------------------------
+ 		// about mapList(finding parent for breeding) 
+ 		// --------------------------------------------------    
+    
+		MongoCollection<Document> mapListCollection = database.getCollection("MapList"); // get Collection
+		if(mapListCollection.count() == 0) return;
+		mapListCollection.deleteOne(new Document("findCharacterFilter", "findCharacterMap"));
+		mapListCollection.deleteOne(new Document("findParentsFilter", "findParentsMap"));        
 	}
 	
 	
@@ -168,6 +178,7 @@ public class DatabaseManager {
         	allParents.put(j,inputData);
         	j++;
         }
+        
         String findParentsString = new GsonBuilder().setPrettyPrinting().create().toJson(allParents);
         Object findParentsJson = JSON.parse(findParentsString);
         Document findParentsDoc = new Document("findParentsMap",findParentsJson);
@@ -209,9 +220,12 @@ public class DatabaseManager {
 	}
 
 	public void test() {
+		// update를 만들수 있으면 최고
         loadCharacterChain();
-        //CharacterChain.test();
-        CharacterChain.breedTest();
+        CharacterChain.test();
+        //CharacterChain.breedTest();
         insertCharacterChain();
+        if(hasData)
+        	deleteCharacterChain();
 	}	
 }

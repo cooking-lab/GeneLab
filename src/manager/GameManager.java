@@ -1,5 +1,7 @@
 package manager;
 
+import com.google.gson.GsonBuilder;
+
 import character.CharacterChain;
 import coin.BlockChain;
 
@@ -11,7 +13,8 @@ public class GameManager {
 		// TODO Auto-generated method stub
 		// db manager 호출
 		init();
-		DM.test();
+		//DM.test();
+		//System.out.println(getCharacter("00000616bff9e9499044b283bc035fda0e03fadcdde3ebcdc827f71f5fd2329a"));
 	}
 	
 	public static void init() {
@@ -24,6 +27,8 @@ public class GameManager {
 		DM.loadCharacterChain();
 		String newCharacterJson = CharacterChain.makeCharacter(DNA);
 		DM.insertCharacterChain();
+		if(DM.hasData)
+			DM.deleteCharacterChain();
 		return newCharacterJson;
 	}
 	
@@ -32,6 +37,15 @@ public class GameManager {
 		DM.loadCharacterChain();
 		String babyJson = CharacterChain.breeding(mamaId, papaId);
 		DM.insertCharacterChain();		
+		if(DM.hasData)
+			DM.deleteCharacterChain();
 		return babyJson;
+	}
+	
+	public static String getCharacter(String id) {
+		init();
+		DM.loadCharacterChain();	
+		String json = new GsonBuilder().setPrettyPrinting().create().toJson(CharacterChain.findCharacter.get(id));
+		return json;
 	}
 }
