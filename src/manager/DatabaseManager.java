@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import character.Character;
 import character.CharacterChain;
@@ -40,6 +41,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.util.JSON;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.and;
 
 public class DatabaseManager {
 	
@@ -52,9 +55,66 @@ public class DatabaseManager {
         		"mongodb://GeneLab:GeneLabPw@lab-shard-00-00.q3vtm.mongodb.net:27017,lab-shard-00-01.q3vtm.mongodb.net:27017,lab-shard-00-02.q3vtm.mongodb.net:27017/Lab?ssl=true&replicaSet=atlas-p8q81q-shard-0&authSource=admin&retryWrites=true&w=majority");
         mongoClient = new MongoClient(geneLabDatabaseUri);
 	}
+
+	// 캐릭터 정보 디비로 들어가서, 성별 / 종족 / 근친 판단
+	public String checkBreedingAvailable(String mamaId, String papaId) {
+		JSONObject res = new JSONObject();
+		String momDNA = CharacterChain.findCharacter.get(mamaId)._DNA;
+		String papaDNA = CharacterChain.findCharacter.get(papaId)._DNA;
+		// 성별
+//		if(momDNA.charAt(2) == papaDNA.charAt(2)) {
+//			res.put("status", false);
+//			res.put("error","같은 성별은 교배가 불가능합니다.");
+//			return res.toString();
+//		}
+		if(!(momDNA.substring(5,8).equals(papaDNA.substring(5,8)))) {
+			res.put("status", false);
+			res.put("error","다른 종족과는 교배가 불가능합니다.");
+			return res.toString();
+		}
+		// 근친
+		JSONArray jArray = new JSONArray();
+		jArray = getCloseFamily(mamaId, 1);
+		JSONArray jArray2 = new JSONArray();
+		jArray2 = getCloseFamily(papaId, 1);
+		System.out.println(jArray);
+		System.out.println(jArray2);
+		
+		return res.toString();
+	}
+	
+	//이제 근친이 있는지 찾는 함수 만들어야함
+	
+	
+	public JSONArray getCloseFamily(String characterID, int depth) {
+		if(depth > 5) {
+			return new JSONArray();
+		}
+		// 0세대, 부모 없음
+		if(CharacterChain.findCharacter.get(characterID)._gen == 0) {
+			return new JSONArray();
+		}
+		JSONArray jArray = new JSONArray();
+
+		JSONObject obj = new JSONObject();
+		String myMamaId = CharacterChain.findCharacter.get(characterID)._mamaId;
+		String myPapaId = CharacterChain.findCharacter.get(characterID)._papaId;
+		obj.put("depth", depth);
+		obj.put("mama", myMamaId);
+		obj.put("papa", myPapaId);
+		jArray.put(obj);
+		
+		List<Object> list = jArray.toList();
+		list.addAll(getCloseFamily(myMamaId, depth++).toList());
+		list.addAll(getCloseFamily(myPapaId, depth++).toList());
+		
+		
+		return new JSONArray(list);
+	}
+	
 	
 	// DB로부터 로딩 -> 알고리즘 진행 -> DB 업데이트.
-	public void loadCharacterChain() {
+	public void loadChain() {
 		// CharacterChain		
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
         MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
@@ -108,7 +168,7 @@ public class DatabaseManager {
 	    
 	}
 	
-	public void deleteCharacterChain() {
+	public void deleteChain() {
 		// 필터 사용시 deleteOne을 하게되면 필터에 해당하는 가장 앞쪽 Data가 지워진다.
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
         MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
@@ -126,7 +186,7 @@ public class DatabaseManager {
 	}
 	
 	
-	public void insertCharacterChain() {
+	public void insertChain() {
 		
 		// --------------------------------------------------
 		// about CharacterChain Database
@@ -221,11 +281,13 @@ public class DatabaseManager {
 
 	public void test() {
 		// update를 만들수 있으면 최고
-        loadCharacterChain();
+        loadChain();
         CharacterChain.test();
         //CharacterChain.breedTest();
-        insertCharacterChain();
+        insertChain();
         if(hasData)
-        	deleteCharacterChain();
-	}	
+        	deleteChain();
+	}
+
+	
 }
