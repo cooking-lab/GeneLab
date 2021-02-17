@@ -59,10 +59,6 @@ public class Character {
     	this._mamaId = mama;
     	this._papaId = papa;
     }
-    
-    public void setGeneration(int gen) {
-    	this._gen = gen;
-    }
 
 
     public String calculateHash() {
@@ -70,11 +66,11 @@ public class Character {
         // 부id + 모id + 토탈 교배 횟수 = 같을 일 없음
         String calculatedhash = StringUtil.applySha256(
         		_previousHash + Long.toString(_timeStamp) + 
-        		Integer.toString(_nonce) + _DNA + _mamaId + _papaId + _gen);
+        		Integer.toString(_nonce) + _DNA + _mamaId + _papaId);
 
         return calculatedhash;
     }
-    
+
 
     public void generateCharacter(int difficulty) {
         String target = new String(new char[difficulty]).replace('\0', '0');
