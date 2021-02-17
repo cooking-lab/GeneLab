@@ -73,7 +73,7 @@ public class CharacterChain {
 //       }
     }
     
-    public static String makeCharacter(String dna) {
+    public static Character makeCharacter(String dna) {
     	
     	// 캐릭터 생성시 1루틴
         //ownerCharacterCount.put(userId, 1); // 1대신 user.number 등 .. 혹은 탐색해서 카운트할 수 있게        
@@ -92,16 +92,15 @@ public class CharacterChain {
         System.out.println(totalCharacterNum +"번째 캐릭터 생성 중...");
         findCharacter.put(blockchain.get(blockchain.size() - 1)._id, newCharacter); // 이게 겹칠 수 있음.
         System.out.println("\nBlockchain is Valid: " + isChainValid());
-        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
-        System.out.println("\nThe Character Chain: ");
-        System.out.println(blockchainJson);
+//        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
+//        System.out.println("\nThe Character Chain: ");
+//        System.out.println(blockchainJson);
         System.out.println("MakeCharacter is Finished!");
-        
-        return blockchainJson;
+        return newCharacter;
     }
     
     // 엄마, 아빠 순으로 id를 받아옴
-    public static String breeding(String female, String male) {
+    public static Character breeding(String female, String male) {
         geneScience gene = new geneScience();
         System.out.println(findCharacter.get(female)._DNA);
         System.out.println(findCharacter.get(male)._DNA);
@@ -117,12 +116,11 @@ public class CharacterChain {
         findCharacter.put(blockchain.get(blockchain.size() - 1)._id, newCharacter);
         parents.put(blockchain.get(blockchain.size() - 1)._id, tempParent);
         System.out.println("\nBlockchain is Valid: " + isChainValid());
-        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
-        System.out.println("\nThe Character Chain: ");
-        System.out.println(blockchainJson);
+//        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
+//        System.out.println("\nThe Character Chain: ");
+//        System.out.println(blockchainJson);
         System.out.println("Breeding is Finished!");
-
-        return blockchainJson;
+        return newCharacter;
     }
 
     // 이 녀석의 부모를 찾아주세요!
@@ -173,7 +171,7 @@ public class CharacterChain {
                 System.out.println("Previous Hashes not equal");
                 return false;
             }
-            if(!currentBlock._hash.substring(0,difficulty).equals(hashTarget)) {
+            if(!currentBlock._hash.substring(0, difficulty).equals(hashTarget)) {
                 System.out.println("This block hasn't ben mined");
                 return false;
             }

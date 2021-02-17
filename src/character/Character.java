@@ -79,6 +79,6 @@ public class Character {
             _hash = calculateHash();
         }
         this._id = _hash; // id랑 hash랑 같은 값임
-        System.out.println("(캐릭터 이름) 생성 완료 : " + _hash);
+        System.out.println("Character generation is done : " + _hash);
     }
 }
