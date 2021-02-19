@@ -82,11 +82,8 @@ public class CharacterChain {
         //parents.put("결과물의 id", breedingNow);
     	totalCharacterNum++;
         Character newCharacter;
-        if(blockchain.size() == 0)
-        	newCharacter = new Character(dna,"0"); // 초기 캐릭터일 경우
-        else 
-        	newCharacter = new Character(dna, blockchain.get(blockchain.size() - 1)._hash); // 아닐경우              
-        
+        if(blockchain.size() == 0) newCharacter = new Character(dna,"0"); // 초기 캐릭터일 경우
+        else newCharacter = new Character(dna, blockchain.get(blockchain.size() - 1)._hash); // 아닐경우                      
         blockchain.add(newCharacter);
         blockchain.get(blockchain.size() - 1).generateCharacter(difficulty); // id 생성 시점 
         System.out.println(totalCharacterNum +"번째 캐릭터 생성 중...");
