@@ -22,9 +22,6 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.json.JSONArray;
 import org.json.JSONObject;
-//import org.json.simple.JSONObject;
-//import org.json.simple.parser.JSONParser;
-//import org.json.simple.parser.ParseException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -32,6 +29,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.mongodb.BasicDBObject;
@@ -70,7 +69,7 @@ public class DatabaseManager {
 		String mamaGene = CharacterChain.findCharacter.get(mamaId)._DNA;
 		String papaGene = CharacterChain.findCharacter.get(papaId)._DNA;
 		
-		if(mamaGene.charAt(3) == papaGene.charAt(3)) {
+		if(mamaGene.charAt(2) == papaGene.charAt(2)) {
 			res.put("status", 504);
 			res.put("error", "같은 성별은 교배 대상이 아닙니다.");
 			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
@@ -78,6 +77,7 @@ public class DatabaseManager {
 		// 같은 종족인지
 		String mamaSpecies = mamaGene.substring(4,7);
 		String papaSpecies = papaGene.substring(4,7);
+
 		if(!mamaSpecies.equals(papaSpecies)){
 			res.put("status", 504);
 			res.put("error", "다른 종족은 교배 대상이 아닙니다.");
@@ -85,18 +85,49 @@ public class DatabaseManager {
 		}
 		
 		// 근친 인지
-//		JSONParser parser = new JSONParser();
-//		Object mama = new Object();
-//		try {
-//			mama = parser.parse(checkCloseFamily(papaId, 1));
-//		} catch (ParseException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		JSONObject jsonObj = (JSONObject) mama;
-//		System.out.println((String) jsonObj.get("name"));
+		JSONObject mamaInit = new JSONObject();
+		mamaInit.put("depth", 0);
+		mamaInit.put("mama", mamaId);
+		mamaInit.put("papa", "");
+		StringBuffer mInit = new StringBuffer(new GsonBuilder().setPrettyPrinting().create().toJson(mamaInit));
+		mInit.replace(0, 10, "");
+		mInit.replace(mInit.length()-2, mInit.length(), ",\n");
 		
-		return "";
+		
+		JSONObject papaInit = new JSONObject();
+		papaInit.put("depth", 0);
+		papaInit.put("mama", "");
+		papaInit.put("papa", papaId);
+		StringBuffer pInit = new StringBuffer(new GsonBuilder().setPrettyPrinting().create().toJson(papaInit));
+		pInit.replace(0, 10, "");
+		pInit.replace(pInit.length()-2, pInit.length(), ",\n");
+		
+		JSONArray mamaArray = new JSONArray("[\n"+mInit.toString()+checkCloseFamily(mamaId, 1)+"]");
+		JSONArray papaArray = new JSONArray("[\n"+pInit.toString()+checkCloseFamily(papaId, 1)+"]");
+
+		for(int i=0; i<mamaArray.length(); i++) {
+			JSONObject mamaObj = mamaArray.getJSONObject(i);
+			String mamaOfMama = mamaObj.getString("mama");
+			String papaOfPapa = mamaObj.getString("papa");
+			for(int j=0; j<papaArray.length(); j++) {
+				JSONObject papaObj = papaArray.getJSONObject(j);
+				
+				if(mamaOfMama.equals(papaObj.getString("mama")) || papaOfPapa.equals(papaObj.getString("papa"))) {
+					// 5촌 이내 근촌
+					if(mamaObj.getInt("depth") + papaObj.getInt("depth") < 6) {
+						res.put("status", 505);
+						res.put("error", "근친은 교배 대상이 아닙니다.");
+						res.put("mom_depth", mamaObj.getInt("depth"));
+						res.put("papa_depth", papaObj.getInt("depth"));
+						return new GsonBuilder().setPrettyPrinting().create().toJson(res);
+					}
+				}
+			}
+			
+		}
+		res.put("status", 200);
+		
+		return new GsonBuilder().setPrettyPrinting().create().toJson(res);
 	}
 	
 	public String checkCloseFamily(String characterId, int depth) {
@@ -120,11 +151,15 @@ public class DatabaseManager {
 		ancestors.put("mama", mamaId);
 		ancestors.put("papa", papaId);
 		
-		String ret = new GsonBuilder().setPrettyPrinting().create().toJson(ancestors);
-		ret += checkCloseFamily(mamaId, depth+1);
-		ret += checkCloseFamily(papaId, depth+1);
+		StringBuffer ret = new StringBuffer(new GsonBuilder().setPrettyPrinting().create().toJson(ancestors));
+		ret.replace(0, 10, "");
+		ret.replace(ret.length()-2, ret.length(), ",\n");
+		String result = ret.toString();
+
+		result += checkCloseFamily(mamaId, depth+1);
+		result += checkCloseFamily(papaId, depth+1);
 		
-		return ret;
+		return result;
 	}
 	
 	// DB로부터 로딩 -> 알고리즘 진행 -> DB 업데이트.
