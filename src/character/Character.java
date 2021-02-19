@@ -59,6 +59,10 @@ public class Character {
     	this._mamaId = mama;
     	this._papaId = papa;
     }
+    
+    public void setGeneration(int gen) {
+    	this._gen = gen;
+    }
 
 
     public String calculateHash() {

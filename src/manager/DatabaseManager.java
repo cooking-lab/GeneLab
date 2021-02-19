@@ -22,6 +22,9 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.json.JSONArray;
 import org.json.JSONObject;
+//import org.json.simple.JSONObject;
+//import org.json.simple.parser.JSONParser;
+//import org.json.simple.parser.ParseException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -44,6 +47,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.util.JSON;
 
+
 public class DatabaseManager {
 	
 	private static MongoClientURI geneLabDatabaseUri; // 접근
@@ -58,6 +62,69 @@ public class DatabaseManager {
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
         MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
         dbHasData = chainListCollection.count() != 0 ? true : false;
+	}
+	
+	public String checkBreedingAvailable(String mamaId, String papaId) {
+		JSONObject res = new JSONObject();
+		// 성별 다른지
+		String mamaGene = CharacterChain.findCharacter.get(mamaId)._DNA;
+		String papaGene = CharacterChain.findCharacter.get(papaId)._DNA;
+		
+		if(mamaGene.charAt(3) == papaGene.charAt(3)) {
+			res.put("status", 504);
+			res.put("error", "같은 성별은 교배 대상이 아닙니다.");
+			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
+		}
+		// 같은 종족인지
+		String mamaSpecies = mamaGene.substring(4,7);
+		String papaSpecies = papaGene.substring(4,7);
+		if(!mamaSpecies.equals(papaSpecies)){
+			res.put("status", 504);
+			res.put("error", "다른 종족은 교배 대상이 아닙니다.");
+			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
+		}
+		
+		// 근친 인지
+//		JSONParser parser = new JSONParser();
+//		Object mama = new Object();
+//		try {
+//			mama = parser.parse(checkCloseFamily(papaId, 1));
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		JSONObject jsonObj = (JSONObject) mama;
+//		System.out.println((String) jsonObj.get("name"));
+		
+		return "";
+	}
+	
+	public String checkCloseFamily(String characterId, int depth) {
+		
+		// gen == 0
+		if(CharacterChain.findCharacter.get(characterId)._gen == 0) {
+			return "";
+		}
+		if(depth == 6) {
+			return "";
+		}
+		JSONObject ancestors = new JSONObject();
+		ancestors.put("depth", depth); // depth : 본인 depth
+		
+		// 엄빠 있으면 찾아서 재귀
+		String mamaId = CharacterChain.findCharacter.get(characterId)._mamaId;
+		String papaId = CharacterChain.findCharacter.get(characterId)._papaId;
+		if(mamaId == null) {
+			return "";
+		}
+		ancestors.put("mama", mamaId);
+		ancestors.put("papa", papaId);
+		
+		String ret = new GsonBuilder().setPrettyPrinting().create().toJson(ancestors);
+		ret += checkCloseFamily(mamaId, depth+1);
+		ret += checkCloseFamily(papaId, depth+1);
+		
+		return ret;
 	}
 	
 	// DB로부터 로딩 -> 알고리즘 진행 -> DB 업데이트.
@@ -78,7 +145,7 @@ public class DatabaseManager {
 	    JSONObject jObjectChain = new JSONObject(mapCursorChain.next().toJson());
 	    JSONArray jArrayChain = jObjectChain.getJSONArray("CharacterChain");
 	    //Type typeList = new TypeToken<ArrayList<Character>>(){}.getType();
-	        
+	    
 	    for(int i = 0; i < jArrayChain.length(); i++) {
 	        	JSONObject obj = jArrayChain.getJSONObject(i);
 	        	String hash = obj.getString("_hash");

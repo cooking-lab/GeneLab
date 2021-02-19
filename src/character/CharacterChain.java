@@ -107,6 +107,7 @@ public class CharacterChain {
         String babyDna = gene.geneMix(findCharacter.get(female)._id, findCharacter.get(male)._id);
     	Character newCharacter = new Character(babyDna, blockchain.get(blockchain.size() - 1)._hash); // 새 캐릭터 생성
     	newCharacter.setParents(female, male);
+    	newCharacter.setGeneration(Math.max(findCharacter.get(female)._gen, findCharacter.get(male)._gen) + 1);
     	String[] tempParent = {female, male}; // 엄마, 아빠 순    	
         blockchain.add(newCharacter); //체인에 부착
         blockchain.get(blockchain.size() - 1).generateCharacter(difficulty); // 해쉬값 생성 (블록에 붙은 시점
