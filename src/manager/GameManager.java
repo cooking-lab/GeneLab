@@ -8,6 +8,7 @@ import com.mongodb.util.JSON;
 import character.Character;
 import character.CharacterChain;
 import coin.BlockChain;
+import gene.geneScience;
 
 public class GameManager {
 
@@ -79,7 +80,8 @@ public class GameManager {
 		// 교배 가능 여부 판단
 		// 성별, 종족, 근친 여부
 		// 교배 ㅇ안됨 + 이유
-		String ret = DM.checkBreedingAvailable(mamaId, papaId);
+		geneScience gene = new geneScience();
+		String ret = gene.checkBreedingAvailable(mamaId, papaId);
 		JSONObject response = new JSONObject(ret);
 		JSONObject response2 = (JSONObject) response.get("map");
 		if(response2.getInt("status") != 200) {
