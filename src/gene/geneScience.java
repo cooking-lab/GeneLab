@@ -7,6 +7,11 @@ import coin.BlockChain;
 import java.util.Arrays;
 import java.util.Random;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.google.gson.GsonBuilder;
+
 public class geneScience {
     public String[] momArray;
     public String[] papaArray;
@@ -23,6 +28,105 @@ public class geneScience {
        int start = arraySum(traitIndx, sliceArray);
         return gene.substring(start, start+sliceArray[traitIndx]);
     }
+    
+	public String checkBreedingAvailable(String mamaId, String papaId) {
+		JSONObject res = new JSONObject();
+		// 성별 다른지
+		String mamaGene = CharacterChain.findCharacter.get(mamaId)._DNA;
+		String papaGene = CharacterChain.findCharacter.get(papaId)._DNA;
+		
+		if(mamaGene.charAt(2) == papaGene.charAt(2)) {
+			res.put("status", 504);
+			res.put("error", "같은 성별은 교배 대상이 아닙니다.");
+			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
+		}
+		// 같은 종족인지
+		String mamaSpecies = mamaGene.substring(4,7);
+		String papaSpecies = papaGene.substring(4,7);
+
+		if(!mamaSpecies.equals(papaSpecies)){
+			res.put("status", 504);
+			res.put("error", "다른 종족은 교배 대상이 아닙니다.");
+			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
+		}
+		
+		// 근친 인지
+		JSONObject mamaInit = new JSONObject();
+		mamaInit.put("depth", 0);
+		mamaInit.put("mama", mamaId);
+		mamaInit.put("papa", "");
+		StringBuffer mInit = new StringBuffer(new GsonBuilder().setPrettyPrinting().create().toJson(mamaInit));
+		mInit.replace(0, 10, "");
+		mInit.replace(mInit.length()-2, mInit.length(), ",\n");
+		
+		
+		JSONObject papaInit = new JSONObject();
+		papaInit.put("depth", 0);
+		papaInit.put("mama", "");
+		papaInit.put("papa", papaId);
+		StringBuffer pInit = new StringBuffer(new GsonBuilder().setPrettyPrinting().create().toJson(papaInit));
+		pInit.replace(0, 10, "");
+		pInit.replace(pInit.length()-2, pInit.length(), ",\n");
+		
+		JSONArray mamaArray = new JSONArray("[\n"+mInit.toString()+checkCloseFamily(mamaId, 1)+"]");
+		JSONArray papaArray = new JSONArray("[\n"+pInit.toString()+checkCloseFamily(papaId, 1)+"]");
+
+		for(int i=0; i<mamaArray.length(); i++) {
+			JSONObject mamaObj = mamaArray.getJSONObject(i);
+			String mamaOfMama = mamaObj.getString("mama");
+			String papaOfPapa = mamaObj.getString("papa");
+			for(int j=0; j<papaArray.length(); j++) {
+				JSONObject papaObj = papaArray.getJSONObject(j);
+				
+				if(mamaOfMama.equals(papaObj.getString("mama")) || papaOfPapa.equals(papaObj.getString("papa"))) {
+					// 5촌 이내 근촌
+					if(mamaObj.getInt("depth") + papaObj.getInt("depth") < 6) {
+						res.put("status", 505);
+						res.put("error", "근친은 교배 대상이 아닙니다.");
+						res.put("mom_depth", mamaObj.getInt("depth"));
+						res.put("papa_depth", papaObj.getInt("depth"));
+						return new GsonBuilder().setPrettyPrinting().create().toJson(res);
+					}
+				}
+			}
+			
+		}
+		res.put("status", 200);
+		
+		return new GsonBuilder().setPrettyPrinting().create().toJson(res);
+	}
+	
+	public String checkCloseFamily(String characterId, int depth) {
+		
+		// gen == 0
+		if(CharacterChain.findCharacter.get(characterId)._gen == 0) {
+			return "";
+		}
+		if(depth == 6) {
+			return "";
+		}
+		JSONObject ancestors = new JSONObject();
+		ancestors.put("depth", depth); // depth : 본인 depth
+		
+		// 엄빠 있으면 찾아서 재귀
+		String mamaId = CharacterChain.findCharacter.get(characterId)._mamaId;
+		String papaId = CharacterChain.findCharacter.get(characterId)._papaId;
+		if(mamaId == null) {
+			return "";
+		}
+		ancestors.put("mama", mamaId);
+		ancestors.put("papa", papaId);
+		
+		StringBuffer ret = new StringBuffer(new GsonBuilder().setPrettyPrinting().create().toJson(ancestors));
+		ret.replace(0, 10, "");
+		ret.replace(ret.length()-2, ret.length(), ",\n");
+		String result = ret.toString();
+
+		result += checkCloseFamily(mamaId, depth+1);
+		result += checkCloseFamily(papaId, depth+1);
+		
+		return result;
+	}
     
     public String geneMix(String momId, String papaId) {
        String momGene = CharacterChain.getDna(momId);
