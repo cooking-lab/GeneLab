@@ -1,5 +1,7 @@
 package manager;
 
+import java.util.HashMap;
+
 import org.json.JSONObject;
 
 import com.google.gson.GsonBuilder;
@@ -42,15 +44,16 @@ public class GameManager {
 		// status 504 : 종족 다름
 		
 		// status 505 : 근친
-		String ret = doBreeding("0000088c108ad5762f360c9fef58422ee47fc3e045d649cc7e1909e1609005fe", "000009888127d51ad0cde46da4057477b7f1c990ff923cb1a80240c2de68cd26");
-		System.out.println(ret);
+//		String ret = doBreeding("0000088c108ad5762f360c9fef58422ee47fc3e045d649cc7e1909e1609005fe", "000009888127d51ad0cde46da4057477b7f1c990ff923cb1a80240c2de68cd26");
+//		System.out.println(ret);
 		//DM.test();
 		//System.out.println(getCharacter("00000616bff9e9499044b283bc035fda0e03fadcdde3ebcdc827f71f5fd2329a"));
+		//gm.makeCharacter("100101010010100011111100011111000011110000011010111110000000111110000011110");
 	}
 	
 	public static void init() {
 		//BlockChain.init(); // BC 모듈 활성화
-		DM = new DatabaseManager();
+		DM = new DatabaseManager("Game", "ChainList");
 	}
 	
 //	public static String testMakeCharacter(String DNA) {
@@ -63,6 +66,7 @@ public class GameManager {
 //		return newCharacterJson;
 //	}
 	
+
 	public String makeCharacter(String DNA) {
 		init();
 		DM.loadChain();
@@ -70,6 +74,9 @@ public class GameManager {
 		if(DM.dbHasData) DM.addChain(newCharacter);
 		else DM.insertChain();
 		String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
+		// insert newCharacter toys DB
+		DM.addNewCharacter(newCharacterString);
+		System.out.println(newCharacterString);
 		return newCharacterString;
 	}
 	

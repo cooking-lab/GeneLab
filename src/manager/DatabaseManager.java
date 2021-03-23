@@ -54,16 +54,16 @@ public class DatabaseManager {
 	public boolean dbHasData = false;
 	public boolean firstCall = true;
 	
-	DatabaseManager() {
+	DatabaseManager(String dbName, String collection) {
 		geneLabDatabaseUri = new MongoClientURI(
         		"mongodb://GeneLab:GeneLabPw@lab-shard-00-00.q3vtm.mongodb.net:27017,lab-shard-00-01.q3vtm.mongodb.net:27017,lab-shard-00-02.q3vtm.mongodb.net:27017/Lab?ssl=true&replicaSet=atlas-p8q81q-shard-0&authSource=admin&retryWrites=true&w=majority");
         mongoClient = new MongoClient(geneLabDatabaseUri);
-		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
-        MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
+		MongoDatabase database = mongoClient.getDatabase(dbName); // get DB			   
+        MongoCollection<Document> chainListCollection = database.getCollection(collection); // get Collection
         dbHasData = chainListCollection.count() != 0 ? true : false;
 	}
 	
-
+	
 	
 	// DB로부터 로딩 -> 알고리즘 진행 -> DB 업데이트.
 	public void loadChain() {
@@ -113,6 +113,31 @@ public class DatabaseManager {
 //	        	System.out.println(gen);
 //	        	System.out.println(ownerId);
 	    }
+	}
+	
+	public void addNewCharacter(String newCharacterString) {
+		MongoDatabase database = mongoClient.getDatabase("Toy"); // get DB
+        MongoCollection<Document> toyCollection = database.getCollection("toys");
+    
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(newCharacterString);
+        
+        Document doc = new Document();
+        doc.append("id", element.getAsJsonObject().get("_id").getAsString());
+        doc.append("name", "testName");
+        doc.append("gender", (element.getAsJsonObject().get("_DNA").getAsString()).charAt(2) == 0 ? "male" : "female");
+        doc.append("generation",element.getAsJsonObject().get("_gen").getAsInt());
+        doc.append("dna", element.getAsJsonObject().get("_DNA").getAsString());
+        doc.append("mamaId", element.getAsJsonObject().get("_mamaId").getAsString());
+        doc.append("papaId", element.getAsJsonObject().get("_papaId").getAsString());
+        doc.append("market", false);
+        doc.append("adventure", false);
+        doc.append("ownerId", element.getAsJsonObject().get("_ownerId").getAsString());
+        doc.append("cooltime", 0);
+
+        toyCollection.insertOne(doc);
+        
+        System.out.println("new character insert!!");
 	}
 	
 	public void addChain(Character newCharacter) {
