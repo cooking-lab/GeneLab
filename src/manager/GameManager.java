@@ -75,7 +75,7 @@ public class GameManager {
 		else DM.insertChain();
 		String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
 		// insert newCharacter toys DB
-		DM.addNewCharacter(newCharacterString);
+		DM.addNewCharacter(newCharacter);
 		System.out.println(newCharacterString);
 		return newCharacterString;
 	}
@@ -98,8 +98,9 @@ public class GameManager {
 		Character baby = CharacterChain.breeding(mamaId, papaId);
 		if(DM.dbHasData) DM.addChain(baby);
 		else DM.insertChain();
-		String babyString = new GsonBuilder().setPrettyPrinting().create().toJson(baby);
+		DM.addNewCharacter(baby);
 		
+		String babyString = new GsonBuilder().setPrettyPrinting().create().toJson(baby);
 		return babyString;
 	}
 	
