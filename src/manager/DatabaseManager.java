@@ -115,9 +115,11 @@ public class DatabaseManager {
 	    }
 	}
 	
-	public void addNewCharacter(String newCharacterString) {
+	public void addNewCharacter(Character newCharacter) {
 		MongoDatabase database = mongoClient.getDatabase("Toy"); // get DB
         MongoCollection<Document> toyCollection = database.getCollection("toys");
+        
+        String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
     
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(newCharacterString);
