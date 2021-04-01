@@ -115,6 +115,15 @@ public class DatabaseManager {
 	    }
 	}
 	
+	public String checkSpecies(String s_dna) {
+		switch(s_dna) {
+		case "100" : return "doll";
+		case "010" : return "robot";
+		case "001" : return "car";
+		}
+		return "";
+	}
+	
 	public void addNewCharacter(Character newCharacter) {
 		MongoDatabase database = mongoClient.getDatabase("Toy"); // get DB
         MongoCollection<Document> toyCollection = database.getCollection("toys");
@@ -123,11 +132,12 @@ public class DatabaseManager {
     
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(newCharacterString);
-        
+       
         Document doc = new Document();
         doc.append("id", element.getAsJsonObject().get("_id").getAsString());
+        doc.append("species", checkSpecies((element.getAsJsonObject().get("_DNA").getAsString()).substring(4, 7)));
         doc.append("name", "testName");
-        doc.append("gender", (element.getAsJsonObject().get("_DNA").getAsString()).charAt(2) == 0 ? "male" : "female");
+        doc.append("gender", (element.getAsJsonObject().get("_DNA").getAsString()).charAt(2) == '0' ? "male" : "female");
         doc.append("generation",element.getAsJsonObject().get("_gen").getAsInt());
         doc.append("dna", element.getAsJsonObject().get("_DNA").getAsString());
         doc.append("mamaId", element.getAsJsonObject().get("_mamaId").getAsString());
