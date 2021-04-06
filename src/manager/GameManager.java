@@ -1,5 +1,7 @@
 package manager;
 
+import java.util.HashMap;
+
 import org.json.JSONObject;
 
 import com.google.gson.GsonBuilder;
@@ -8,6 +10,7 @@ import com.mongodb.util.JSON;
 import character.Character;
 import character.CharacterChain;
 import coin.BlockChain;
+import gene.geneScience;
 
 public class GameManager {
 
@@ -29,9 +32,9 @@ public class GameManager {
 //		
 //		gm.makeCharacter("101001010010110100101111000000110000001100000010011000000110000001100000011");
 //		gm.makeCharacter("100101010010100011111100011111000011110000011010111110000000111110000011110");
-//	
-//		doBreeding("0000019a716f5cdeedff47af6b4a40bffac6e36d14f962f63e43ef2f5a51ae1b","00000bc7f61388ecf6bec8dd363fe1e09947c2502f803a4b71210e9be870876c");
-//		doBreeding("000009f44bab170c049cd8201720ae4e07455562eae606b1fc62d4a980d310f2","0000021d730b5dadc8da7666286f4a10dd26813f15f7a5433b172643d9268086");
+	
+		doBreeding("00000ac9d93d8cc9a68f75714473b92876f55b4948c5cff9481cf0be6ed69dc1","000007fc85da58e279f4b911634614c3ac4d36dada2063233b13b198bffa49e9");
+		doBreeding("00000f1943cf20201ef5c9a74a0008a967a6d223f9cbd8e109e044d2589272d2","00000af89132d04b3fab56cfc07b03872e70366c7170816e40e70075d840ba79");
 		
 		// status 200
 		
@@ -41,15 +44,16 @@ public class GameManager {
 		// status 504 : 종족 다름
 		
 		// status 505 : 근친
-		String ret = doBreeding("0000088c108ad5762f360c9fef58422ee47fc3e045d649cc7e1909e1609005fe", "000009888127d51ad0cde46da4057477b7f1c990ff923cb1a80240c2de68cd26");
-		System.out.println(ret);
+//		String ret = doBreeding("0000088c108ad5762f360c9fef58422ee47fc3e045d649cc7e1909e1609005fe", "000009888127d51ad0cde46da4057477b7f1c990ff923cb1a80240c2de68cd26");
+//		System.out.println(ret);
 		//DM.test();
 		//System.out.println(getCharacter("00000616bff9e9499044b283bc035fda0e03fadcdde3ebcdc827f71f5fd2329a"));
+		//gm.makeCharacter("100101010010100011111100011111000011110000011010111110000000111110000011110");
 	}
 	
 	public static void init() {
 		//BlockChain.init(); // BC 모듈 활성화
-		DM = new DatabaseManager();
+		DM = new DatabaseManager("Game", "ChainList");
 	}
 	
 //	public static String testMakeCharacter(String DNA) {
@@ -62,6 +66,7 @@ public class GameManager {
 //		return newCharacterJson;
 //	}
 	
+
 	public String makeCharacter(String DNA) {
 		init();
 		DM.loadChain();
@@ -69,6 +74,9 @@ public class GameManager {
 		if(DM.dbHasData) DM.addChain(newCharacter);
 		else DM.insertChain();
 		String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
+		// insert newCharacter toys DB
+		DM.addNewCharacter(newCharacter);
+		System.out.println(newCharacterString);
 		return newCharacterString;
 	}
 	
@@ -79,7 +87,8 @@ public class GameManager {
 		// 교배 가능 여부 판단
 		// 성별, 종족, 근친 여부
 		// 교배 ㅇ안됨 + 이유
-		String ret = DM.checkBreedingAvailable(mamaId, papaId);
+		geneScience gene = new geneScience();
+		String ret = gene.checkBreedingAvailable(mamaId, papaId);
 		JSONObject response = new JSONObject(ret);
 		JSONObject response2 = (JSONObject) response.get("map");
 		if(response2.getInt("status") != 200) {
@@ -89,8 +98,9 @@ public class GameManager {
 		Character baby = CharacterChain.breeding(mamaId, papaId);
 		if(DM.dbHasData) DM.addChain(baby);
 		else DM.insertChain();
-		String babyString = new GsonBuilder().setPrettyPrinting().create().toJson(baby);
+		DM.addNewCharacter(baby);
 		
+		String babyString = new GsonBuilder().setPrettyPrinting().create().toJson(baby);
 		return babyString;
 	}
 	

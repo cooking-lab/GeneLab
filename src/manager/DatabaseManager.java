@@ -54,113 +54,16 @@ public class DatabaseManager {
 	public boolean dbHasData = false;
 	public boolean firstCall = true;
 	
-	DatabaseManager() {
+	DatabaseManager(String dbName, String collection) {
 		geneLabDatabaseUri = new MongoClientURI(
         		"mongodb://GeneLab:GeneLabPw@lab-shard-00-00.q3vtm.mongodb.net:27017,lab-shard-00-01.q3vtm.mongodb.net:27017,lab-shard-00-02.q3vtm.mongodb.net:27017/Lab?ssl=true&replicaSet=atlas-p8q81q-shard-0&authSource=admin&retryWrites=true&w=majority");
         mongoClient = new MongoClient(geneLabDatabaseUri);
-		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
-        MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
+		MongoDatabase database = mongoClient.getDatabase(dbName); // get DB			   
+        MongoCollection<Document> chainListCollection = database.getCollection(collection); // get Collection
         dbHasData = chainListCollection.count() != 0 ? true : false;
 	}
 	
-	public String checkBreedingAvailable(String mamaId, String papaId) {
-		JSONObject res = new JSONObject();
-		// 성별 다른지
-		String mamaGene = CharacterChain.findCharacter.get(mamaId)._DNA;
-		String papaGene = CharacterChain.findCharacter.get(papaId)._DNA;
-		
-		if(mamaGene.charAt(2) == papaGene.charAt(2)) {
-			res.put("status", 504);
-			res.put("error", "같은 성별은 교배 대상이 아닙니다.");
-			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
-		}
-		// 같은 종족인지
-		String mamaSpecies = mamaGene.substring(4,7);
-		String papaSpecies = papaGene.substring(4,7);
-
-		if(!mamaSpecies.equals(papaSpecies)){
-			res.put("status", 504);
-			res.put("error", "다른 종족은 교배 대상이 아닙니다.");
-			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
-		}
-		
-		// 근친 인지
-		JSONObject mamaInit = new JSONObject();
-		mamaInit.put("depth", 0);
-		mamaInit.put("mama", mamaId);
-		mamaInit.put("papa", "");
-		StringBuffer mInit = new StringBuffer(new GsonBuilder().setPrettyPrinting().create().toJson(mamaInit));
-		mInit.replace(0, 10, "");
-		mInit.replace(mInit.length()-2, mInit.length(), ",\n");
-		
-		
-		JSONObject papaInit = new JSONObject();
-		papaInit.put("depth", 0);
-		papaInit.put("mama", "");
-		papaInit.put("papa", papaId);
-		StringBuffer pInit = new StringBuffer(new GsonBuilder().setPrettyPrinting().create().toJson(papaInit));
-		pInit.replace(0, 10, "");
-		pInit.replace(pInit.length()-2, pInit.length(), ",\n");
-		
-		JSONArray mamaArray = new JSONArray("[\n"+mInit.toString()+checkCloseFamily(mamaId, 1)+"]");
-		JSONArray papaArray = new JSONArray("[\n"+pInit.toString()+checkCloseFamily(papaId, 1)+"]");
-
-		for(int i=0; i<mamaArray.length(); i++) {
-			JSONObject mamaObj = mamaArray.getJSONObject(i);
-			String mamaOfMama = mamaObj.getString("mama");
-			String papaOfPapa = mamaObj.getString("papa");
-			for(int j=0; j<papaArray.length(); j++) {
-				JSONObject papaObj = papaArray.getJSONObject(j);
-				
-				if(mamaOfMama.equals(papaObj.getString("mama")) || papaOfPapa.equals(papaObj.getString("papa"))) {
-					// 5촌 이내 근촌
-					if(mamaObj.getInt("depth") + papaObj.getInt("depth") < 6) {
-						res.put("status", 505);
-						res.put("error", "근친은 교배 대상이 아닙니다.");
-						res.put("mom_depth", mamaObj.getInt("depth"));
-						res.put("papa_depth", papaObj.getInt("depth"));
-						return new GsonBuilder().setPrettyPrinting().create().toJson(res);
-					}
-				}
-			}
-			
-		}
-		res.put("status", 200);
-		
-		return new GsonBuilder().setPrettyPrinting().create().toJson(res);
-	}
 	
-	public String checkCloseFamily(String characterId, int depth) {
-		
-		// gen == 0
-		if(CharacterChain.findCharacter.get(characterId)._gen == 0) {
-			return "";
-		}
-		if(depth == 6) {
-			return "";
-		}
-		JSONObject ancestors = new JSONObject();
-		ancestors.put("depth", depth); // depth : 본인 depth
-		
-		// 엄빠 있으면 찾아서 재귀
-		String mamaId = CharacterChain.findCharacter.get(characterId)._mamaId;
-		String papaId = CharacterChain.findCharacter.get(characterId)._papaId;
-		if(mamaId == null) {
-			return "";
-		}
-		ancestors.put("mama", mamaId);
-		ancestors.put("papa", papaId);
-		
-		StringBuffer ret = new StringBuffer(new GsonBuilder().setPrettyPrinting().create().toJson(ancestors));
-		ret.replace(0, 10, "");
-		ret.replace(ret.length()-2, ret.length(), ",\n");
-		String result = ret.toString();
-
-		result += checkCloseFamily(mamaId, depth+1);
-		result += checkCloseFamily(papaId, depth+1);
-		
-		return result;
-	}
 	
 	// DB로부터 로딩 -> 알고리즘 진행 -> DB 업데이트.
 	public void loadChain() {
@@ -210,6 +113,43 @@ public class DatabaseManager {
 //	        	System.out.println(gen);
 //	        	System.out.println(ownerId);
 	    }
+	}
+	
+	public String checkSpecies(String s_dna) {
+		switch(s_dna) {
+		case "100" : return "doll";
+		case "010" : return "robot";
+		case "001" : return "car";
+		}
+		return "";
+	}
+	
+	public void addNewCharacter(Character newCharacter) {
+		MongoDatabase database = mongoClient.getDatabase("Toy"); // get DB
+        MongoCollection<Document> toyCollection = database.getCollection("toys");
+        
+        String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
+    
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(newCharacterString);
+       
+        Document doc = new Document();
+        doc.append("id", element.getAsJsonObject().get("_id").getAsString());
+        doc.append("species", checkSpecies((element.getAsJsonObject().get("_DNA").getAsString()).substring(4, 7)));
+        doc.append("name", "testName");
+        doc.append("gender", (element.getAsJsonObject().get("_DNA").getAsString()).charAt(2) == '0' ? "male" : "female");
+        doc.append("generation",element.getAsJsonObject().get("_gen").getAsInt());
+        doc.append("dna", element.getAsJsonObject().get("_DNA").getAsString());
+        doc.append("mamaId", element.getAsJsonObject().get("_mamaId").getAsString());
+        doc.append("papaId", element.getAsJsonObject().get("_papaId").getAsString());
+        doc.append("market", false);
+        doc.append("adventure", false);
+        doc.append("ownerId", element.getAsJsonObject().get("_ownerId").getAsString());
+        doc.append("cooltime", 0);
+
+        toyCollection.insertOne(doc);
+        
+        System.out.println("new character insert!!");
 	}
 	
 	public void addChain(Character newCharacter) {
