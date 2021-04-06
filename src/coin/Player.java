@@ -10,22 +10,24 @@ public class Player {
     private String id; // id for login
     private String pw; // pw for login
     private float stone; // game money for reinforce (?)
+    private String introduce;
     public int hasCharacterNum;
     public ArrayList<Character> characterList = new ArrayList<Character>();
 
     private boolean _isAdmin = false;
 
-    public Player(String id, String pw, String name) {
+    public Player(String id, String pw, String name, String introduce) {
         this.id = id;
         this.pw = pw;
         this.name = name;
         this.wallet = new Wallet(); // 지갑 생성
         this.stone = 0;
         this.coin = 0;
+        this.introduce = introduce;
         this.hasCharacterNum = 0;
     }
 
-    public Player(String id, String pw, String name, boolean isAdmin) {
+    public Player(String id, String pw, String name, String introduce, boolean isAdmin) {
         this.id = id;
         this.pw = pw;
         this.name = name;

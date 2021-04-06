@@ -61,7 +61,7 @@ public class BlockChain {
     public static void init(){
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider()); //Setup Bouncey castle as a Security Provider
         coinpool = new Wallet();
-        admin = new Player("adminId","adminPw","admin",true); // 관리자 계정
+        admin = new Player("adminId","adminPw","admin","",true); // 관리자 계정
 
         // 초기 트랜잭션 생성 : WalletA에 100 coin 전송
         // coinpool : 초기에 돈을 생성하는 풀
