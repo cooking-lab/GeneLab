@@ -2,9 +2,13 @@ package coin;
 
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.bouncycastle.util.encoders.Base64;
 
 public class Wallet {
     public PrivateKey privateKey;
@@ -13,9 +17,52 @@ public class Wallet {
     // String과 output -> 코인 보유자 & 보유량 저장하는 구조
     public HashMap<String,TransactionOutput> UTXOs = new HashMap<String,TransactionOutput>();
 
-    public Wallet() {
-        generateKeyPair();
+    public Wallet(boolean isNew) {
+    	if(isNew)
+    		generateKeyPair();
     } // 지갑 생성시 자동으로 KeyPair 생성
+
+	public void makeNewWallet() {
+    	
+    }
+    
+    public void loadWallet() {
+    	
+    }
+    
+    public String getStringFromPublicKey() {
+        String pub = StringUtil.getStringFromKey(publicKey);
+    	return pub;
+    }
+    
+    public String getStringFromPrivateKey() {
+        String pri = StringUtil.getStringFromKey(privateKey);
+    	return "";
+    }
+    
+    public void setPublicKeyFromString(String pub) {
+    	try {
+    		byte[] pubDecoded = StringUtil.getKeyFromString(pub);
+        	X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(pubDecoded);
+        	KeyFactory pubFactory = KeyFactory.getInstance("ECDSA");
+        	publicKey = pubFactory.generatePublic(pubSpec);
+    	}
+        catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public void setPrivateKeyFromString(String pri) {
+    	try {
+    		byte[] priDecoded = StringUtil.getKeyFromString(pri);
+            PKCS8EncodedKeySpec priSpec = new PKCS8EncodedKeySpec(priDecoded);
+            KeyFactory priFactory = KeyFactory.getInstance("ECDSA");
+            privateKey = priFactory.generatePrivate(priSpec);
+    	}
+        catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     // key generator
     public void generateKeyPair() {
@@ -29,7 +76,29 @@ public class Wallet {
             // KeyPair로부터 PublicKey, PrivateKey 생성
             privateKey = keyPair.getPrivate();
             publicKey = keyPair.getPublic();
-
+            
+            String pub = StringUtil.getStringFromKey(publicKey);
+            String pri = StringUtil.getStringFromKey(privateKey);
+            System.out.println("String 변환 : " + pub);
+            System.out.println("String 변환 : " + pri);
+            System.out.println("JAVA의 BASE64모듈을 사용하여 publicKey로 변환 : " + StringUtil.getKeyFromString(pub));
+            System.out.println("JAVA의 BASE64모듈을 사용하여 privateKey로 변환 : " + StringUtil.getKeyFromString(pri));
+            
+            byte[] pubDecoded = StringUtil.getKeyFromString(pub);
+            X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(pubDecoded);
+            KeyFactory pubFactory = KeyFactory.getInstance("ECDSA");
+            PublicKey pubKey = pubFactory.generatePublic(pubSpec);
+            
+            byte[] priDecoded = StringUtil.getKeyFromString(pri);
+            PKCS8EncodedKeySpec priSpec = new PKCS8EncodedKeySpec(priDecoded);
+            KeyFactory priFactory = KeyFactory.getInstance("ECDSA");
+            PrivateKey priKey = priFactory.generatePrivate(priSpec);
+            
+            System.out.println("초기 생성 public Key" + publicKey);
+            System.out.println("초기 생성 private Key" + privateKey);
+            
+            System.out.println("추출 이후 public Key" + pubKey);
+            System.out.println("추출 이후 private Key : " + priKey);
         }catch(Exception e) {
             throw new RuntimeException(e);
         }
