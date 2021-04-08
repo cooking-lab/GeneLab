@@ -200,22 +200,22 @@ public class DatabaseManager {
                 
 	}
 	
-	public void deleteChain() {
-		// 필터 사용시 deleteOne을 하게되면 필터에 해당하는 가장 앞쪽 Data가 지워진다.
-		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
-        MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
-        
-		chainListCollection.deleteOne(new Document("ChainFilter","CharacterChain"));
-	    
-    	// --------------------------------------------------
- 		// about mapList(finding parent for breeding) 
- 		// --------------------------------------------------    
-    
-		MongoCollection<Document> mapListCollection = database.getCollection("MapList"); // get Collection
-		if(mapListCollection.count() == 0) return;
-		mapListCollection.deleteOne(new Document("findCharacterFilter", "findCharacterMap"));
-		mapListCollection.deleteOne(new Document("findParentsFilter", "findParentsMap"));        
-	}
+//	public void deleteChain() {
+//		// 필터 사용시 deleteOne을 하게되면 필터에 해당하는 가장 앞쪽 Data가 지워진다.
+//		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
+//      MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
+//        
+//		chainListCollection.deleteOne(new Document("ChainFilter","CharacterChain"));
+//	    
+//    	// --------------------------------------------------
+// 		// about mapList(finding parent for breeding) 
+// 		// --------------------------------------------------    
+//    
+//		MongoCollection<Document> mapListCollection = database.getCollection("MapList"); // get Collection
+//		if(mapListCollection.count() == 0) return;
+//		mapListCollection.deleteOne(new Document("findCharacterFilter", "findCharacterMap"));
+//		mapListCollection.deleteOne(new Document("findParentsFilter", "findParentsMap"));        
+//	}
 	
 	
 	public void insertChain() {
@@ -291,28 +291,39 @@ public class DatabaseManager {
         // 4. DB에 갱신해                
 	}
 	
-	public void insertObject(Object key, Object value) {
-		
-		if(key instanceof Character) {
-			
-			return;
-		} else if (key instanceof Block) {
-			
-			return;
-		}
-		
-	}
-	
-	public void deleteObject() {
-		
-	}
-	
-	public void findObject() {
-		
-	}
-	
-	public void initObject() {
-		
+	public void signUp(String id, String password, String nickname) {
+		// CharacterChain		
+		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
+        MongoCollection<Document> playerCollection = database.getCollection("players"); // get Collection  
+        
+        Player newPlayer = new Player(id, password, nickname, "");
+        
+        String newPlayerString = new GsonBuilder().setPrettyPrinting().create().toJson(newPlayer);
+        
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(newPlayerString);
+       
+        Document doc = new Document();
+        doc.append("id", element.getAsJsonObject().get("_id").getAsString());
+        doc.append("password", element.getAsJsonObject().get("_password").getAsString());
+        doc.append("nickname", element.getAsJsonObject().get("_nickname").getAsString());
+        doc.append("introduction", element.getAsJsonObject().get("_introduction").getAsString());
+        doc.append("publicKey", newPlayer._wallet.getStringFromPublicKey());
+        doc.append("privateKey", newPlayer._wallet.getStringFromPublicKey());
+        String publicKey = new GsonBuilder().setPrettyPrinting().create().toJson(newPlayer._wallet.publicKey);
+        String privateKey = new GsonBuilder().setPrettyPrinting().create().toJson(newPlayer._wallet.privateKey);
+        System.out.println("GSON 변환 : " + publicKey);
+        System.out.println("GSON 변환 : " + privateKey);
+        // doc.append("publicKey", publicKey);
+        System.out.println("DB 접근시 : " + newPlayer._wallet.publicKey);
+        System.out.println("DB 접근시 : " + newPlayer._wallet.privateKey);
+        System.out.println(element.getAsJsonObject().get("_wallet"));
+        // doc.append("wallet",element.getAsJsonObject().get("_wallet").getAsJsonObject());
+
+        playerCollection.insertOne(doc);
+        
+        System.out.println("Sign up fin!!");
+        
 	}
 
 	public void test() {
@@ -321,6 +332,5 @@ public class DatabaseManager {
         CharacterChain.test();
         //CharacterChain.breedTest();
         insertChain();
-        deleteChain();
 	}	
 }

@@ -72,6 +72,11 @@ public class StringUtil {
     public static String getStringFromKey(Key key) {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
+    
+    public static byte[] getKeyFromString(String string) {
+        return Base64.getDecoder().decode(string);
+    }
+    
 
     // 머클트리의 루트를 찾는 함수
     public static String getMerkleRoot(ArrayList<Transaction> transactions) {
@@ -95,5 +100,6 @@ public class StringUtil {
         String merkleRoot = (treeLayer.size() == 1) ? treeLayer.get(0) : "";
         return merkleRoot;
     }
+
 
 }

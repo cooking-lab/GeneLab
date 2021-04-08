@@ -15,26 +15,15 @@ import gene.geneScience;
 public class GameManager {
 
 	private static DatabaseManager DM;
-
+	private static GameManager GM;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		// db manager 호출
-		//init();
-		GameManager gm = new GameManager();
-//		gm.makeCharacter("111101001100010011000011111111111111111111111100011111111111111111111111111");
-//		gm.makeCharacter("110001010100111101010011100000111000001110000001111100000111000001110000001");
-//		
-//		gm.makeCharacter("111001001110011011100111110000111100001111000000111110000111100001111000010");
-//		gm.makeCharacter("110101001100110100110111111000111110001111100011111111000111110001111100011");
-//		
-//		gm.makeCharacter("101101010000100100001010000000100000001000000001010000000100000001000000001");
-//		gm.makeCharacter("100001010000011011011011111100111111001111110011011111100111111001111110000");
-//		
-//		gm.makeCharacter("101001010010110100101111000000110000001100000010011000000110000001100000011");
-//		gm.makeCharacter("100101010010100011111100011111000011110000011010111110000000111110000011110");
-	
-		doBreeding("00000ac9d93d8cc9a68f75714473b92876f55b4948c5cff9481cf0be6ed69dc1","000007fc85da58e279f4b911634614c3ac4d36dada2063233b13b198bffa49e9");
-		doBreeding("00000f1943cf20201ef5c9a74a0008a967a6d223f9cbd8e109e044d2589272d2","00000af89132d04b3fab56cfc07b03872e70366c7170816e40e70075d840ba79");
+		init();
+		GM = new GameManager();		
+		GM.signUp("t4","t5","t6");
+//		doBreeding("00000ac9d93d8cc9a68f75714473b92876f55b4948c5cff9481cf0be6ed69dc1","000007fc85da58e279f4b911634614c3ac4d36dada2063233b13b198bffa49e9");
+//		doBreeding("00000f1943cf20201ef5c9a74a0008a967a6d223f9cbd8e109e044d2589272d2","00000af89132d04b3fab56cfc07b03872e70366c7170816e40e70075d840ba79");
 		
 		// status 200
 		
@@ -44,15 +33,10 @@ public class GameManager {
 		// status 504 : 종족 다름
 		
 		// status 505 : 근친
-//		String ret = doBreeding("0000088c108ad5762f360c9fef58422ee47fc3e045d649cc7e1909e1609005fe", "000009888127d51ad0cde46da4057477b7f1c990ff923cb1a80240c2de68cd26");
-//		System.out.println(ret);
-		//DM.test();
-		//System.out.println(getCharacter("00000616bff9e9499044b283bc035fda0e03fadcdde3ebcdc827f71f5fd2329a"));
-		//gm.makeCharacter("100101010010100011111100011111000011110000011010111110000000111110000011110");
 	}
 	
 	public static void init() {
-		//BlockChain.init(); // BC 모듈 활성화
+		BlockChain.init(); // BC 모듈 활성화
 		DM = new DatabaseManager("Game", "ChainList");
 	}
 	
@@ -65,7 +49,12 @@ public class GameManager {
 //			DM.deleteCharacterChain();
 //		return newCharacterJson;
 //	}
-	
+	public void signUp(String id, String password, String nickname) {
+		init();
+		DM.loadChain();
+		DM.signUp(id, password, nickname);
+		System.out.println("good");
+	}
 
 	public String makeCharacter(String DNA) {
 		init();
