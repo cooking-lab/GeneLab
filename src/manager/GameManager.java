@@ -21,7 +21,11 @@ public class GameManager {
 		// db manager 호출
 		init();
 		GM = new GameManager();		
-		GM.signUp("t4","t5","t6");
+		DM.loadTransactionChain();
+		DM.sendCoin("t1", "t4", 500);
+		DM.insertTransactionChain();
+//		GM.signUp("t1", "t2", "t3");
+//		GM.signUp("t4", "t5", "t6");
 //		doBreeding("00000ac9d93d8cc9a68f75714473b92876f55b4948c5cff9481cf0be6ed69dc1","000007fc85da58e279f4b911634614c3ac4d36dada2063233b13b198bffa49e9");
 //		doBreeding("00000f1943cf20201ef5c9a74a0008a967a6d223f9cbd8e109e044d2589272d2","00000af89132d04b3fab56cfc07b03872e70366c7170816e40e70075d840ba79");
 		
@@ -36,6 +40,7 @@ public class GameManager {
 	}
 	
 	public static void init() {
+		BlockChain.onBC();
 		BlockChain.init(); // BC 모듈 활성화
 		DM = new DatabaseManager("Game", "ChainList");
 	}
@@ -49,20 +54,26 @@ public class GameManager {
 //			DM.deleteCharacterChain();
 //		return newCharacterJson;
 //	}
+	
+	public void sendCoin() {
+		DM.loadTransactionChain();
+	}
+	
 	public void signUp(String id, String password, String nickname) {
-		init();
-		DM.loadChain();
+		// init();
+		// DM.loadCharacterChain();
 		DM.signUp(id, password, nickname);
 		System.out.println("good");
 	}
 
 	public String makeCharacter(String DNA) {
 		init();
-		DM.loadChain();
+		DM.loadCharacterChain();
 		Character newCharacter = CharacterChain.makeCharacter(DNA);
-		if(DM.dbHasData) DM.addChain(newCharacter);
-		else DM.insertChain();
+		if(DM.dbHasData) DM.addCharacterChain(newCharacter);
+		else DM.insertCharacterChain();
 		String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
+		
 		// insert newCharacter toys DB
 		DM.addNewCharacter(newCharacter);
 		System.out.println(newCharacterString);
@@ -71,7 +82,7 @@ public class GameManager {
 	
 	public static String doBreeding(String mamaId, String papaId) {
 		init();
-		DM.loadChain();
+		DM.loadCharacterChain();
 		System.out.println("****************************************");
 		// 교배 가능 여부 판단
 		// 성별, 종족, 근친 여부
@@ -85,8 +96,8 @@ public class GameManager {
 		}
 		
 		Character baby = CharacterChain.breeding(mamaId, papaId);
-		if(DM.dbHasData) DM.addChain(baby);
-		else DM.insertChain();
+		if(DM.dbHasData) DM.addCharacterChain(baby);
+		else DM.insertCharacterChain();
 		DM.addNewCharacter(baby);
 		
 		String babyString = new GsonBuilder().setPrettyPrinting().create().toJson(baby);
@@ -95,7 +106,7 @@ public class GameManager {
 	
 	public String getCharacter(String id) {
 		init();
-		if(CharacterChain.blockchain.size() == 0) DM.loadChain();
+		if(CharacterChain.blockchain.size() == 0) DM.loadCharacterChain();
 		String json = new GsonBuilder().setPrettyPrinting().create().toJson(CharacterChain.findCharacter.get(id));
 		return json;
 	}

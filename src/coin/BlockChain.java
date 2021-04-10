@@ -13,7 +13,7 @@ public class BlockChain {
     // Chain 정보는 무조건 다 불러와야 하지만 Player는 다 불러올 필요는 없음 ㅇㅇ.
     public static ArrayList<Player> playerList = new ArrayList<Player>();
 
-    public static int difficulty = 5; // 00000으로 시작하는 hash mining
+    public static int difficulty = 5; // 00R000으로 시작하는 hash mining
     public static float minimumTransaction = 0.1f; // 거래 최소량 -> 0.1 이하는 거래불가
     public static Wallet coinpool; // 코인 최초 발행
     public static Player admin; // 관리자
@@ -35,22 +35,21 @@ public class BlockChain {
 
     // 관리자 입장에서 특정 유저에서 특정 유저로 코인 보낼 수 있도록 (관리용)
     public static void sendCoin(Player from, Player to, float value){
-        System.out.println("\n이전 블럭의 해쉬값 : "+ blockchain.get(blockchain.size() - 1).hash);
-        Block block1 = new Block(blockchain.get(blockchain.size() - 1).hash); // 이전블록에서 잇는 구조
+        System.out.println("\n이전 블럭의 해쉬값 : "+ blockchain.get(blockchain.size() - 1)._hash);
+        Block block1 = new Block(blockchain.get(blockchain.size() - 1)._hash); // 이전블록에서 잇는 구조
         System.out.println("\n"+ from._nickname+ "의 코인 총량 : " + from._wallet.getBalance());
         System.out.println("\n"+ from._nickname+ "의 지갑에서 "+to._nickname+" 지갑으로 "+value+"의 코인 전송 시도 중...");
         // walletA.sendFunds 함수가 transaction자체를 반환해서 한번에 등록하는 구조
-        // block1.addTransaction(from.wallet.sendFunds(to.wallet.publicKey, value)); // 송금
-        System.out.println("\n"+ from._nickname+ "의 코인 총량 : " + from._wallet.getBalance());
+        block1.addTransaction(from._wallet.sendFunds(to._wallet.publicKey, value)); // 송금
+        System.out.println("\n"+ from._nickname + "의 코인 총량 : " + from._wallet.getBalance());
         System.out.println("\n"+ to._nickname +"의 코인 총량 : " + to._wallet.getBalance());
-        addBlock(block1);
-        isChainValid();
+        addBlock(block1);      
     }
 
     // 초기 플레이어에게 500코인 셋팅
     public static void setCoinToPlayer(Player player){
-        System.out.println("\n이전 블럭의 해쉬값 : "+ blockchain.get(blockchain.size() - 1).hash);
-        Block block1 = new Block(blockchain.get(blockchain.size() - 1).hash); // 이전블록에서 잇는 구조
+        System.out.println("\n이전 블럭의 해쉬값 : "+ blockchain.get(blockchain.size() - 1)._hash);
+        Block block1 = new Block(blockchain.get(blockchain.size() - 1)._hash); // 이전블록에서 잇는 구조
         System.out.println("\n관리자 지갑의 코인 총량 : " + admin.getBalance());
         System.out.println("\n관리자 지갑에서 플레이어 지갑으로 (500)의 코인 전송 시도 중...");
         // walletA.sendFunds 함수가 transaction자체를 반환해서 한번에 등록하는 구조
@@ -58,17 +57,19 @@ public class BlockChain {
         System.out.println("\n관리자의 코인 총량 : " + admin.getBalance());
         System.out.println("\n" + player._nickname +"의 코인 총량 : " + player.getBalance());
         addBlock(block1);
-        isChainValid();
+    }
+    
+    public static void onBC() {    	
+    	Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider()); //Setup Bouncey castle as a Security Provider
     }
 
     public static void init(){
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider()); //Setup Bouncey castle as a Security Provider
-        coinpool = new Wallet(true);
-        admin = new Player("adminId","adminPw","admin","",true); // 관리자 계정
+        coinpool = new Wallet();
+        admin = new Player("adminId","adminPw","admin","", true); // 관리자 계정
 
         // 초기 트랜잭션 생성 : WalletA에 100 coin 전송
         // coinpool : 초기에 돈을 생성하는 풀
-        genesisTransaction = new Transaction(coinpool.publicKey, admin._wallet.publicKey, 10000f, null);
+        genesisTransaction = new Transaction(coinpool.publicKey, admin._wallet.publicKey, 100000f, null);
         genesisTransaction.generateSignature(coinpool.privateKey); // genesis transaction 셋팅
         genesisTransaction.transactionId = "0"; // 초기 트랜잭션 id 설정
         genesisTransaction.outputs.add(new TransactionOutput(
@@ -83,6 +84,13 @@ public class BlockChain {
         Block genesis = new Block("0"); // 첫블럭의 이전블럭은 존재하지 않기에 0
         genesis.addTransaction(genesisTransaction); // 블럭에 Transaction 추가
         addBlock(genesis); // 체인에 블럭 추가
+    }
+    
+    // 체인에 블럭추가
+    public static void addBlock(Block newBlock) {
+        newBlock.mineBlock(difficulty);
+        blockchain.add(newBlock);
+        isChainValid();
     }
 
     public static Boolean isChainValid() {
@@ -99,26 +107,26 @@ public class BlockChain {
             previousBlock = blockchain.get(i-1);
             // 현재 블럭에 저장된 해쉬와 계산한 해쉬 비교 -> 값 변동성 확인
             // 기존에 저장된 해쉬는 그대로여도 내용이 변했다면 계산된 해쉬의 내용이 변함
-            if(!currentBlock.hash.equals(currentBlock.calculateHash()) ){
+            if(!currentBlock._hash.equals(currentBlock.calculateHash()) ){
                 System.out.println("#Current Hashes not equal");
                 return false;
             }
             // 이전 블럭에 저장된 해쉬와 계산한 해쉬 비교 -> 값 변동성 확인
             // 기존에 저장된 해쉬는 그대로여도 내용이 변했다면 계산된 해쉬의 내용이 변함
-            if(!previousBlock.hash.equals(currentBlock.previousHash) ) {
+            if(!previousBlock._hash.equals(currentBlock._previousHash) ) {
                 System.out.println("#Previous Hashes not equal");
                 return false;
             }
             // 앞자리 0 x difficulty 만족하지 않을경우
-            if(!currentBlock.hash.substring( 0, difficulty).equals(hashTarget)) {
+            if(!currentBlock._hash.substring( 0, difficulty).equals(hashTarget)) {
                 System.out.println("#This block hasn't been mined");
                 return false;
             }
 
             // 블록 내 트랜잭션 검증 :
             TransactionOutput tempOutput;
-            for(int t=0; t <currentBlock.transactions.size(); t++) {
-                Transaction currentTransaction = currentBlock.transactions.get(t);
+            for(int t=0; t <currentBlock._transactions.size(); t++) {
+                Transaction currentTransaction = currentBlock._transactions.get(t);
 
                 if(!currentTransaction.verifySignature()) {
                     System.out.println("#Signature on Transaction(" + t + ") is Invalid");
@@ -161,11 +169,5 @@ public class BlockChain {
         }
         System.out.println("Blockchain is valid");
         return true;
-    }
-
-    // 체인에 블럭추가
-    public static void addBlock(Block newBlock) {
-        newBlock.mineBlock(difficulty);
-        blockchain.add(newBlock);
     }
 }

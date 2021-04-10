@@ -8,7 +8,11 @@ public class Transaction {
 
     public String transactionId; // 트랜잭션의 hash값
     public PublicKey sender; // 보내는 사람의 public key
-    public PublicKey reciepient; // 받는 사람의 public key.
+    public PublicKey reciepient; // 받는 사람의 public key.        
+    
+    public String senderHash;
+    public String reciepientHash;
+    
     public float value; // 보내는 코인의 양
     public byte[] signature; // 받는이, 보내는이, 코인의 양을 이용해서 제작된 해쉬로 양측간 합의된 서명 제작
 
@@ -18,11 +22,34 @@ public class Transaction {
     private static int sequence = 0; // 생성된 트랜잭션 개수
 
     // Constructor
-    public Transaction(PublicKey from, PublicKey to, float value,  ArrayList<TransactionInput> inputs) {
+    public Transaction(PublicKey from, PublicKey to, float value, ArrayList<TransactionInput> inputs) {
         this.sender = from;
         this.reciepient = to;
         this.value = value;
         this.inputs = inputs;
+        this.senderHash = StringUtil.getStringFromKey(from);
+        this.reciepientHash = StringUtil.getStringFromKey(to);
+    }
+    
+    public Transaction(
+    		String transactionId, 
+    		PublicKey from, 
+    		PublicKey to, 
+    		String senderHash,
+    		String reciepientHash,
+    		float value, 
+    		byte[] signature,
+    		ArrayList<TransactionInput> inputs,
+    		ArrayList<TransactionOutput> outputs
+    		) {
+        this.sender = from;
+        this.reciepient = to;
+        this.senderHash = senderHash;
+        this.reciepientHash = reciepientHash;
+        this.value = value;
+        this.signature = signature.clone();
+        this.inputs = inputs;
+        this.outputs = outputs;
     }
 
     public boolean processTransaction() {
