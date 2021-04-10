@@ -1,6 +1,11 @@
 # GeneLab
-Cryptoys 블록체인 솔루션
+Cryptoys BlockChain & Genetic Algorithm
 
-# 개요
-Cryptoys의 블록체인을 포함하고 있습니다. <br>
-ERC721 기반의 토큰과, 토큰을 거래하는 과정에서 사용되는 ERC20 기반의 Coin Transactions Lists를 기록합니다. <br>
+## KU GraduationProject Team 1
+이 프로젝트는 Cryptoys의 블록체인과 유전 알고리즘 로직을 포함하고 있습니다.
+
+아래의 Standard를 적용하여 JAVA로 제작합니다. (진행 중)
+
+- ERC721(https://ethereum.org/en/developers/docs/standards/tokens/erc-721/) NTF Token
+- ERC20(https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) Coin Transactions Lists
+
