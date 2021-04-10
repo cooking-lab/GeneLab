@@ -6,6 +6,6 @@ Cryptoys BlockChain & Genetic Algorithm
 
 아래의 Standard를 적용하여 JAVA로 제작합니다. (진행 중)
 
-- ERC721(https://ethereum.org/en/developers/docs/standards/tokens/erc-721/) NTF Token
-- ERC20(https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) Coin Transactions Lists
+- [ERC721](https://ethereum.org/en/developers/docs/standards/tokens/erc-721/) NTF Token
+- [ERC20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) Coin Transactions Lists
 
