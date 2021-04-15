@@ -10,6 +10,7 @@ import com.mongodb.util.JSON;
 import character.Character;
 import character.CharacterChain;
 import coin.BlockChain;
+import coin.Player;
 import gene.geneScience;
 
 public class GameManager {
@@ -18,14 +19,28 @@ public class GameManager {
 	private static GameManager GM;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+				
 		// db manager 호출
 		init();
-		GM = new GameManager();		
-		DM.loadTransactionChain();
-		DM.sendCoin("t1", "t4", 500);
-		DM.insertTransactionChain();
+		GM = new GameManager();
+//		DM.loadTransactionChain();
+		
+		// 회원가입
 //		GM.signUp("t1", "t2", "t3");
 //		GM.signUp("t4", "t5", "t6");
+				
+		// player Test
+		Player p1 = DM.findPlayer("t1"); // DB에서 load
+		Player p2 = DM.findPlayer("t4");		
+		BlockChain.setCoinToPlayer(p1);
+		BlockChain.sendCoin(p1, p2, 500);
+		DM.insertTransactionChain();
+		String str = new GsonBuilder().setPrettyPrinting().create().toJson(BlockChain.blockchain);
+		System.out.println(str);
+		
+//		System.out.println(p1.getBalance());
+//		System.out.println(p2.getBalance());
+//		DM.sendCoin("t1", "t4", 500);
 //		doBreeding("00000ac9d93d8cc9a68f75714473b92876f55b4948c5cff9481cf0be6ed69dc1","000007fc85da58e279f4b911634614c3ac4d36dada2063233b13b198bffa49e9");
 //		doBreeding("00000f1943cf20201ef5c9a74a0008a967a6d223f9cbd8e109e044d2589272d2","00000af89132d04b3fab56cfc07b03872e70366c7170816e40e70075d840ba79");
 		

@@ -25,6 +25,7 @@ public class StringUtil {
                 if(hex.length() == 1) hexString.append('0');
                 hexString.append(hex);
             }
+            
             return hexString.toString();
         }
         catch(Exception e) {
@@ -84,7 +85,7 @@ public class StringUtil {
     	try {
     		byte[] pubDecoded = StringUtil.getKeyFromString(string);
         	X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(pubDecoded);
-        	KeyFactory pubFactory = KeyFactory.getInstance("ECDSA");
+        	KeyFactory pubFactory = KeyFactory.getInstance("ECDSA", "BC");
         	System.out.println("publicKey Decoding");
         	publicKey = pubFactory.generatePublic(pubSpec);
     	}
@@ -99,7 +100,7 @@ public class StringUtil {
     	try {            
     		byte[] priDecoded = StringUtil.getKeyFromString(string);
             PKCS8EncodedKeySpec priSpec = new PKCS8EncodedKeySpec(priDecoded);
-            KeyFactory priFactory = KeyFactory.getInstance("ECDSA");
+            KeyFactory priFactory = KeyFactory.getInstance("ECDSA", "BC");
             System.out.println("privateKey Decoding");
             privateKey = priFactory.generatePrivate(priSpec);
     	}

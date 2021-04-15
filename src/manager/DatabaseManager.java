@@ -50,6 +50,11 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.util.JSON;
+import org.bson.Document; 
+import com.mongodb.client.FindIterable; 
+import static com.mongodb.client.model.Filters.*; 
+import static com.mongodb.client.model.Sorts.ascending; 
+import static java.util.Arrays.asList;
 
 
 public class DatabaseManager {
@@ -65,7 +70,10 @@ public class DatabaseManager {
         mongoClient = new MongoClient(geneLabDatabaseUri);
 		MongoDatabase database = mongoClient.getDatabase(dbName); // get DB			   
         MongoCollection<Document> chainListCollection = database.getCollection(collection); // get Collection
-        dbHasData = chainListCollection.count() != 0 ? true : false;
+        dbHasData = chainListCollection.count() != 0 ? true : false;        
+        
+        MongoCollection<Document> transactionChainListCollection = database.getCollection("TransactionChainList"); // get Collection
+        dbHasTransaction = transactionChainListCollection.count() != 0 ? true : false;
 	}	
 	
 	// DB로부터 로딩 -> 알고리즘 진행 -> DB 업데이트.
@@ -288,42 +296,12 @@ public class DatabaseManager {
         // 4. DB에 갱신해                
 	}
 	
-	public void signUp(String id, String password, String nickname) {
-		// CharacterChain		
-		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
-        MongoCollection<Document> playerCollection = database.getCollection("players"); // get Collection  
-        
-        Player newPlayer = new Player(id, password, nickname, "", true);
-        
-        String newPlayerString = new GsonBuilder().setPrettyPrinting().create().toJson(newPlayer);
-        Object newPlayerJson = JSON.parse(newPlayerString);
-        
-        JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(newPlayerString);
-       
-        Document doc = new Document();
-        
-        // user Info
-        doc.append("id", element.getAsJsonObject().get("_id").getAsString());
-        doc.append("password", element.getAsJsonObject().get("_password").getAsString());
-        doc.append("nickname", element.getAsJsonObject().get("_nickname").getAsString());
-        doc.append("introduction", element.getAsJsonObject().get("_introduction").getAsString());
-        
-        // Wallet
-        JSONObject wallet = new JSONObject();
-        wallet.put("publicKey", newPlayer._wallet.getStringFromPublicKey());
-        wallet.put("privateKey", newPlayer._wallet.getStringFromPrivateKey());        
-        String walletString = new GsonBuilder().setPrettyPrinting().create().toJson(wallet);
-        Object walletJson = JSON.parse(walletString);
-        doc.append("wallet", walletJson);        
-        doc.append("coin", 0);
-
-        playerCollection.insertOne(doc);
-        
-        System.out.println("Sign up fin!!");        
-	}
-	
 	public void loadTransactionChain() {
+		
+	    // ---------------------
+	 	// load TransactionChain
+	 	// ---------------------
+		
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB
         MongoCollection<Document> transactionChainListCollection = database.getCollection("TransactionChainList"); // get Collection
         
@@ -333,7 +311,7 @@ public class DatabaseManager {
 	    MongoCursor<Document> mapCursorChain = iterDocChain.iterator();
 	    
 	    JSONObject jObjectChain = new JSONObject(mapCursorChain.next().toJson());
-	    JSONArray jArrayChain = jObjectChain.getJSONArray("TransactionChainList");	    
+	    JSONArray jArrayChain = jObjectChain.getJSONArray("TransactionChain");	    
 
 	    for(int i = 0; i < jArrayChain.length(); i++) {
 	        	JSONObject obj = jArrayChain.getJSONObject(i);
@@ -341,10 +319,10 @@ public class DatabaseManager {
 	        	// Block
 	        	String hash = obj.getString("_hash");
 	        	String previousHash = obj.getString("_previousHash");
-	        	String merkleRoot = obj.getString("merkleRoot");
+	        	String merkleRoot = obj.getString("_merkleRoot");
 	        	
 	        	// Transaction
-	        	JSONArray jArrayTransaction = obj.getJSONArray("transactions");
+	        	JSONArray jArrayTransaction = obj.getJSONArray("_transactions");
 	        	ArrayList<Transaction> transactionsLists = new ArrayList<Transaction>();
 	        	for(int j = 0; j < jArrayTransaction.length(); j++) {
 	        		JSONObject transObj = jArrayTransaction.getJSONObject(j);
@@ -371,8 +349,9 @@ public class DatabaseManager {
 		        		        			        	
 		        	// inputs (List) 
 		        	// 여기는 반드시 TransactionInputList가 NULL일 가능성 고려해주어야함!! (추후 수정)
-		        	JSONArray jArrayInput = transObj.getJSONArray("inputs");
 		            ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
+		        	if(i != 0) {
+			        	JSONArray jArrayInput = transObj.getJSONArray("inputs");
 		        	for(int k = 0; k < jArrayInput.length(); k++) {
 		        		JSONObject inputObj = jArrayInput.getJSONObject(k);
 		        		
@@ -384,11 +363,11 @@ public class DatabaseManager {
 		        		String UTXOId = UTXOObj.getString("id");
 		        		
 		        		// Key
-		        		String reciepientHashOfOutput = UTXOObj.getString("reciepientHashOfOutput");
+		        		String reciepientHashOfOutput = UTXOObj.getString("reciepientHash");
 		        		PublicKey reciepientKeyOfOutput = StringUtil.getPublicKeyFromString(reciepientHashOfOutput); 
 		        		
 		        		float valueOfOutput = UTXOObj.getFloat("value");
-		        		String parentTrasnactionId = UTXOObj.getString("parentTrasnactionId");
+		        		String parentTrasnactionId = UTXOObj.getString("parentTransactionId");
 		        		
 		        		TransactionOutput UTXO = new TransactionOutput(
 		        				UTXOId, 
@@ -402,21 +381,22 @@ public class DatabaseManager {
 		        		TransactionInput inputElement = new TransactionInput(transactionOutputId, UTXO);
 		        		inputs.add(inputElement);
 		        	}
+		        	}
 		        	
 		        	// outputs (List)
 		        	JSONArray jArrayOutput = transObj.getJSONArray("outputs");
 		            ArrayList<TransactionOutput> outputs = new ArrayList<TransactionOutput>();
-		        	for(int k = 0; k < jArrayInput.length(); k++) {
+		        	for(int k = 0; k < jArrayOutput.length(); k++) {
 		        		JSONObject outputObj = jArrayOutput.getJSONObject(k);
 
 		        		String outputId = outputObj.getString("id");
 		        		
 		        		// Key
-		        		String reciepientHashOfOutput = outputObj.getString("reciepientHashOfOutput");
+		        		String reciepientHashOfOutput = outputObj.getString("reciepientHash");
 		        		PublicKey reciepientKeyOfOutput = StringUtil.getPublicKeyFromString(reciepientHashOfOutput); 
 		        		
 		        		float valueOfOutput = outputObj.getFloat("value");
-		        		String parentTrasnactionId = outputObj.getString("parentTrasnactionId");
+		        		String parentTrasnactionId = outputObj.getString("parentTransactionId");
 		        		
 		        		TransactionOutput UTXO = new TransactionOutput(
 		        				outputId, 
@@ -442,7 +422,8 @@ public class DatabaseManager {
 		        			inputs,
 		        			outputs
 		        			);
-		        	transactionsLists.add(null);
+		        	
+		        	transactionsLists.add(transaction);
 	        	}
 	        	
 	        	// for making hash
@@ -451,6 +432,21 @@ public class DatabaseManager {
 	        	Block temp = new Block(hash,previousHash,merkleRoot,transactionsLists,timeStamp,nonce);
 	        	BlockChain.blockchain.add(temp);
 	    }
+	    
+	    // ----------
+	 	// load UTXOs
+	 	// ----------
+	    
+	    MongoCollection<Document> UTXOsCollection = database.getCollection("UTXOs"); // get Collection
+		
+		FindIterable<Document> iterUTXOs = transactionChainListCollection.find().projection(fields(include("UTXOs"), excludeId()));
+	    MongoCursor<Document> mapCursorUTXOs = iterDocChain.iterator();
+	    
+	    JSONObject UTXOsObject = new JSONObject(mapCursorChain.next().toJson());
+	    JSONArray UTXOsArray = jObjectChain.getJSONArray("TransactionChain");	    	    
+	    
+	    String a = new GsonBuilder().setPrettyPrinting().create().toJson(BlockChain.blockchain);
+	    System.out.println(a);
 	}
 	
 	public void addTransaction() {
@@ -459,7 +455,7 @@ public class DatabaseManager {
 	
 	public void insertTransactionChain() {
 		// --------------------------------------------------
-		// about trasnactionChain Database
+		// about trasnactionChain Database (BlockChain)
 		// --------------------------------------------------
 
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
@@ -475,68 +471,123 @@ public class DatabaseManager {
 		
 		System.out.println("Transaction Insert Fin!!");
 		
+		
 		// --------------------------------------------------
 		// about UTXOsList (Exchange or sendcoin List ) Database
 		// --------------------------------------------------        
-
-//		MongoCollection<Document> mapListCollection = database.getCollection("UTXOsList"); 
-
-//		// Save MapList 
+		
+		MongoCollection<Document> UTXOsCollection = database.getCollection("UTXOs"); 
+				
+		// Save UTXOs 
 //		List<Document> UTXOsList= new ArrayList<>();        
-//
-//		// insert findCharacter Map
-//		int i = 0;
-//		JSONArray allCharacter = new JSONArray();
-//		for(Entry<String, TransactionOutput> kv : BlockChain.UTXOs.entrySet()) {
-//			JSONObject inputData = new JSONObject();
-//			inputData.put("_id", kv.getKey());
-//			inputData.put("_character", kv.getValue());
-//			allCharacter.put(i, inputData);
-//			i++;
-//		}
-//		String findCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(allCharacter);
-//		Object findCharacterJson= JSON.parse(findCharacterString);
-//		Document findCharacterDoc = new Document("findCharacterMap", findCharacterJson);
-//		findCharacterDoc.append("findCharacterFilter", "findCharacterMap");
-//		mapLists.add(findCharacterDoc);
-//
-//		// insert findParents Map
-//		int j = 0;
-//		JSONArray allParents = new JSONArray();
-//		for(Entry<String, String[]> kv : CharacterChain.parents.entrySet()) {
-//			JSONObject inputData = new JSONObject();
-//			inputData.put("_babyId", kv.getKey());
-//			inputData.put("_parents", kv.getValue());
-//			allParents.put(j,inputData);
-//			j++;
-//		}
-//
-//		String findParentsString = new GsonBuilder().setPrettyPrinting().create().toJson(allParents);
-//		Object findParentsJson = JSON.parse(findParentsString);
-//		Document findParentsDoc = new Document("findParentsMap",findParentsJson);
-//		findParentsDoc.append("findParentsFilter", "findParentsMap");
-//		mapLists.add(findParentsDoc);
-//
-//		// save List
-//		mapListCollection.insertMany(mapLists);
+
+		// insert UTXOs
+		int i = 0;
+		JSONArray UTXO = new JSONArray();
+		for(Entry<String, TransactionOutput> kv : BlockChain.UTXOs.entrySet()) {
+			JSONObject inputData = new JSONObject();
+			inputData.put("_transactionId", kv.getKey());
+			inputData.put("_transactionOutput", kv.getValue());
+			UTXO.put(i, inputData);
+			i++;
+		}
+		
+		String UTXOsString = new GsonBuilder().setPrettyPrinting().create().toJson(UTXO);
+		Object UTXOsJson= JSON.parse(UTXOsString);
+		
+		Document UTXOsDoc = new Document("UTXOs", UTXOsJson);
+		UTXOsDoc.append("UTXOsFilter", "UTXOs");
+
+		UTXOsCollection.insertOne(UTXOsDoc);
+		
+		System.out.println("UTXOs Insert Fin!!");
 
 	}
 	
-	public Player findPlayer(String id) {
+	public void modifyPlayerInfo() {
+		
+	}
+	
+	public void signUp(String id, String password, String nickname) {
+		
+		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
+        MongoCollection<Document> playerCollection = database.getCollection("Players"); // get Collection  
+
+        Player newPlayer = new Player(id, password, nickname, "");
+
+		String newPlayerString = new GsonBuilder().setPrettyPrinting().create().toJson(newPlayer);
+		Object newPlayerJson = JSON.parse(newPlayerString);
+
+		Document characterChainDocument = new Document("Players", newPlayerJson);        
+		characterChainDocument.append("PlayerFilter", "player");
+
+		playerCollection.insertOne(characterChainDocument);
+		
+		System.out.println("SignUp Fin!!");
+	}
+	
+	
+	public void insertPlayer(Player p) {
+		
+		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
+        MongoCollection<Document> playerCollection = database.getCollection("Players"); // get Collection  
+
+        //Player newPlayer = new Player(id, password, nickname, "");
+
+		String newPlayerString = new GsonBuilder().setPrettyPrinting().create().toJson(p);
+		Object newPlayerJson = JSON.parse(newPlayerString);
+
+		Document characterChainDocument = new Document("Players", newPlayerJson);        
+		characterChainDocument.append("ChainFilter", "player");
+
+		playerCollection.insertOne(characterChainDocument);
+		
+		System.out.println("Player Insert Fin!!");
+	}
+	
+	
+	public Player findPlayer(String id) {		
 		// findPlayer
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB
-        MongoCollection<Document> playerCollection = database.getCollection("players");
+        MongoCollection<Document> playerCollection = database.getCollection("Players");
         
-        Document playerDoc = playerCollection.find(Filters.eq("id", id)).first();
-	    JSONObject jObjectPlayer = new JSONObject(playerDoc);
+//        FindIterable<Document> playerIterator = playerCollection.find(eq("PlayerFilter","player")).
+//        		projection(fields(include("Players"), excludeId()));
+        
+        Document playerDoc = playerCollection.find(eq("Players.id",id)).projection(fields(include("Players"), excludeId())).first();
+	    JSONObject jObjectPlayer = new JSONObject(playerDoc).getJSONObject("Players");
+	    
+//               
+//       	// ---------------------
+//    		// about CharacterChain & Map
+//    		// ---------------------
+//       
+//		FindIterable<Document> iterDocChain = playerCollection.find().projection(fields(include("CharacterChain"), excludeId()));
+//	    MongoCursor<Document> mapCursorChain = iterDocChain.iterator();        
+//	        
+//	    JSONObject jObjectChain = new JSONObject(mapCursorChain.next().toJson());
+//	    JSONArray jArrayChain = jObjectChain.getJSONArray("CharacterChain");
+	    
+	    
+//	    JSONObject UTXOsObject = jObjectPlayer.getJSONObject("_wallet").getJSONObject("UTXOs");
+//	    HashMap<String,TransactionOutput> UTXOs = new HashMap<String,TransactionOutput>();
+//		if(UTXOsObject.length() != 0) {
+//			JSONArray UTXOsArray = UTXOsObject.getJSONArray("myArrayList");
+//			for(int i = 0; i < UTXOsArray.length(); i++) {
+//				
+//			}
+//		}
 	    
 		Player findOne = new Player(
 				jObjectPlayer.getString("id"),
 				jObjectPlayer.getString("password"),
 				jObjectPlayer.getString("nickname"),
 				jObjectPlayer.getString("introduction"),
-				jObjectPlayer.getJSONObject("wallet").getJSONObject("map").getString("publicKey"),
-				jObjectPlayer.getJSONObject("wallet").getJSONObject("map").getString("privateKey")
+				jObjectPlayer.getString("publicKey"),
+				jObjectPlayer.getString("privateKey"),
+				jObjectPlayer.getFloat("coin"),
+				jObjectPlayer.getFloat("stone"),				
+				jObjectPlayer.getInt("hasCharacterNum")
 			);
 		
 		return findOne;
@@ -550,6 +601,8 @@ public class DatabaseManager {
 		// get recipient Infomation
 		Player T = findPlayer(to);
 		BlockChain.sendCoin(S, T, 500);
+//		insertPlayer(S);
+//		insertPlayer(T);
 	}
 
 	public void test() {

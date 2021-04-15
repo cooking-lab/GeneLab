@@ -16,7 +16,12 @@ public class Wallet {
 
     // String과 output -> 코인 보유자 & 보유량 저장하는 구조
     public HashMap<String,TransactionOutput> UTXOs = new HashMap<String,TransactionOutput>();
-
+    
+    public Wallet(PublicKey pub, PrivateKey pri) {
+    	this.publicKey = pub;
+    	this.privateKey = pri;
+    }
+    
     public Wallet() {
     	generateKeyPair();
     } // 지갑 생성시 자동으로 KeyPair 생성
@@ -61,10 +66,11 @@ public class Wallet {
     public void generateKeyPair() {
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDSA","BC");
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
+            ECGenParameterSpec ecSpec = new ECGenParameterSpec("sect163k1");
+//            ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
             // generator 초기화 및 KeyPair 생성
-            keyGen.initialize(ecSpec, random); //256
+            keyGen.initialize(ecSpec);
+//            keyGen.initialize(ecSpec, random); //256
             KeyPair keyPair = keyGen.generateKeyPair();
             // KeyPair로부터 PublicKey, PrivateKey 생성
             privateKey = keyPair.getPrivate();
@@ -81,7 +87,7 @@ public class Wallet {
         for (Map.Entry<String, TransactionOutput> item: BlockChain.UTXOs.entrySet()){
             TransactionOutput UTXO = item.getValue();
             if(UTXO.isMine(publicKey)) { //if output belongs to me ( if coins belong to me )
-                UTXOs.put(UTXO.id,UTXO); //add it to our list of unspent transactions.
+                UTXOs.put(UTXO.id, UTXO); //add it to our list of unspent transactions.
                 total += UTXO.value ;
             }
         }
