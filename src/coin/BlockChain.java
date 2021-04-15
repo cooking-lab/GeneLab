@@ -6,8 +6,11 @@ import java.util.HashMap;
 
 public class BlockChain {
 
-    public static ArrayList<Block> blockchain = new ArrayList<Block>(); // Block들을 저장하는 구조
-    public static HashMap<String,TransactionOutput> UTXOs = new HashMap<String,TransactionOutput>(); // 거래 내역을 저장하는 구조
+	// BlockChain
+    public static ArrayList<Block> blockchain = new ArrayList<Block>(); 
+    
+    // 거래 내역을 저장하는 구조
+    public static HashMap<String,TransactionOutput> UTXOs = new HashMap<String,TransactionOutput>();
     
     // Trasnaction을 위한 Player List Upload를 할 필요가 있을 수도 있긴 하다.
     // Chain 정보는 무조건 다 불러와야 하지만 Player는 다 불러올 필요는 없음 ㅇㅇ.
@@ -37,12 +40,12 @@ public class BlockChain {
     public static void sendCoin(Player from, Player to, float value){
         System.out.println("\n이전 블럭의 해쉬값 : "+ blockchain.get(blockchain.size() - 1)._hash);
         Block block1 = new Block(blockchain.get(blockchain.size() - 1)._hash); // 이전블록에서 잇는 구조
-        System.out.println("\n"+ from._nickname+ "의 코인 총량 : " + from._wallet.getBalance());
-        System.out.println("\n"+ from._nickname+ "의 지갑에서 "+to._nickname+" 지갑으로 "+value+"의 코인 전송 시도 중...");
+        System.out.println("\n"+ from.nickname+ "의 코인 총량 : " + from.wallet.getBalance());
+        System.out.println("\n"+ from.nickname+ "의 지갑에서 "+to.nickname+" 지갑으로 "+value+"의 코인 전송 시도 중...");
         // walletA.sendFunds 함수가 transaction자체를 반환해서 한번에 등록하는 구조
-        block1.addTransaction(from._wallet.sendFunds(to._wallet.publicKey, value)); // 송금
-        System.out.println("\n"+ from._nickname + "의 코인 총량 : " + from._wallet.getBalance());
-        System.out.println("\n"+ to._nickname +"의 코인 총량 : " + to._wallet.getBalance());
+        block1.addTransaction(from.wallet.sendFunds(to.wallet.publicKey, value)); // 송금
+        System.out.println("\n"+ from.nickname + "의 코인 총량 : " + from.wallet.getBalance());
+        System.out.println("\n"+ to.nickname +"의 코인 총량 : " + to.wallet.getBalance());
         addBlock(block1);      
     }
 
@@ -53,9 +56,9 @@ public class BlockChain {
         System.out.println("\n관리자 지갑의 코인 총량 : " + admin.getBalance());
         System.out.println("\n관리자 지갑에서 플레이어 지갑으로 (500)의 코인 전송 시도 중...");
         // walletA.sendFunds 함수가 transaction자체를 반환해서 한번에 등록하는 구조
-        block1.addTransaction(admin._wallet.sendFunds(player._wallet.publicKey, 500f)); // 송금
+        block1.addTransaction(admin.wallet.sendFunds(player.wallet.publicKey, 500f)); // 송금
         System.out.println("\n관리자의 코인 총량 : " + admin.getBalance());
-        System.out.println("\n" + player._nickname +"의 코인 총량 : " + player.getBalance());
+        System.out.println("\n" + player.nickname +"의 코인 총량 : " + player.getBalance());
         addBlock(block1);
     }
     
@@ -63,13 +66,12 @@ public class BlockChain {
     	Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider()); //Setup Bouncey castle as a Security Provider
     }
 
-    public static void init(){
-        coinpool = new Wallet();
+    public static void init(){              
+    	coinpool = new Wallet();
         admin = new Player("adminId","adminPw","admin","", true); // 관리자 계정
-
         // 초기 트랜잭션 생성 : WalletA에 100 coin 전송
         // coinpool : 초기에 돈을 생성하는 풀
-        genesisTransaction = new Transaction(coinpool.publicKey, admin._wallet.publicKey, 100000f, null);
+        genesisTransaction = new Transaction(coinpool.publicKey, admin.wallet.publicKey, 100000f, null);
         genesisTransaction.generateSignature(coinpool.privateKey); // genesis transaction 셋팅
         genesisTransaction.transactionId = "0"; // 초기 트랜잭션 id 설정
         genesisTransaction.outputs.add(new TransactionOutput(
@@ -78,7 +80,6 @@ public class BlockChain {
                 genesisTransaction.transactionId)); // the Transactions Output 셋팅
 
         UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0));
-
         System.out.println("Genesis Block 생성 중...");
 
         Block genesis = new Block("0"); // 첫블럭의 이전블럭은 존재하지 않기에 0
