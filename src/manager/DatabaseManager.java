@@ -148,10 +148,11 @@ public class DatabaseManager {
         doc.append("dna", element.getAsJsonObject().get("_DNA").getAsString());
         doc.append("mamaId", element.getAsJsonObject().get("_mamaId").getAsString());
         doc.append("papaId", element.getAsJsonObject().get("_papaId").getAsString());
-        doc.append("market", false);
+        doc.append("market", null);
         doc.append("adventure", false);
         doc.append("ownerId", element.getAsJsonObject().get("_ownerId").getAsString());
         doc.append("cooltime", 0);
+        doc.append("marketType", "other");
 
         toyCollection.insertOne(doc);
         
