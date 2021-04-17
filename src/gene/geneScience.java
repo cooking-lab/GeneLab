@@ -15,8 +15,8 @@ import com.google.gson.GsonBuilder;
 public class geneScience {
     public String[] momArray;
     public String[] papaArray;
-    public int traitNum = 14;
-    public int[] sliceArray = {4, 3, 4, 4, 4, 3, 8, 8, 8, 3, 8, 8, 8, 2};
+    public int traitNum = 11;
+    public int[] sliceArray = {4, 3, 4, 4, 4, 3, 3, 8, 8, 8, 2};
 
     private double mutationPer = 0.005;
 
