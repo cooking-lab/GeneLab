@@ -2,9 +2,13 @@ package coin;
 
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.bouncycastle.util.encoders.Base64;
 
 public class Wallet {
     public PrivateKey privateKey;
@@ -12,24 +16,66 @@ public class Wallet {
 
     // String과 output -> 코인 보유자 & 보유량 저장하는 구조
     public HashMap<String,TransactionOutput> UTXOs = new HashMap<String,TransactionOutput>();
-
+    
+    public Wallet(PublicKey pub, PrivateKey pri) {
+    	this.publicKey = pub;
+    	this.privateKey = pri;
+    }
+    
     public Wallet() {
-        generateKeyPair();
+    	generateKeyPair();
     } // 지갑 생성시 자동으로 KeyPair 생성
+    
+    public String getStringFromPublicKey() {
+        String pub = StringUtil.getStringFromKey(publicKey);
+    	return pub;
+    }
+    
+    public String getStringFromPrivateKey() {
+        String pri = StringUtil.getStringFromKey(privateKey);
+    	return pri;
+    }
+    
+    public void setPublicKeyFromString(String pub) {
+    	try {
+    		byte[] pubDecoded = StringUtil.getKeyFromString(pub);
+        	X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(pubDecoded);
+        	KeyFactory pubFactory = KeyFactory.getInstance("ECDSA");
+        	System.out.println("publicKey Decoding");
+        	this.publicKey = pubFactory.generatePublic(pubSpec);
+    	}
+        catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public void setPrivateKeyFromString(String pri) {
+    	try {            
+    		byte[] priDecoded = StringUtil.getKeyFromString(pri);
+            PKCS8EncodedKeySpec priSpec = new PKCS8EncodedKeySpec(priDecoded);
+            KeyFactory priFactory = KeyFactory.getInstance("ECDSA");
+            System.out.println("privateKey Decoding");
+            this.privateKey = priFactory.generatePrivate(priSpec);
+    	}
+        catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     // key generator
     public void generateKeyPair() {
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDSA","BC");
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
+            ECGenParameterSpec ecSpec = new ECGenParameterSpec("sect163k1");
+//            ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
             // generator 초기화 및 KeyPair 생성
-            keyGen.initialize(ecSpec, random); //256
+            keyGen.initialize(ecSpec);
+//            keyGen.initialize(ecSpec, random); //256
             KeyPair keyPair = keyGen.generateKeyPair();
             // KeyPair로부터 PublicKey, PrivateKey 생성
             privateKey = keyPair.getPrivate();
             publicKey = keyPair.getPublic();
-
+            System.out.println("Key Generation Fin!");
         }catch(Exception e) {
             throw new RuntimeException(e);
         }
@@ -40,8 +86,8 @@ public class Wallet {
         float total = 0;
         for (Map.Entry<String, TransactionOutput> item: BlockChain.UTXOs.entrySet()){
             TransactionOutput UTXO = item.getValue();
-            if(UTXO.isMine(publicKey)) { //if output belongs to me ( if coins belong to me )
-                UTXOs.put(UTXO.id,UTXO); //add it to our list of unspent transactions.
+            if(UTXO.isMine(getStringFromPublicKey())) { //if output belongs to me ( if coins belong to me )
+                UTXOs.put(UTXO.id, UTXO); //add it to our list of unspent transactions.
                 total += UTXO.value ;
             }
         }
@@ -49,7 +95,7 @@ public class Wallet {
     }
 
     // 코인 전송
-    public Transaction sendFunds(PublicKey _recipient, float value ) {
+    public Transaction sendFunds(PublicKey _recipient, float value) {
         if(getBalance() < value) {
             System.out.println("#Not Enough funds to send transaction. Transaction Discarded.");
             return null;
