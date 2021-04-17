@@ -39,6 +39,7 @@ public class GameManager {
 	
 		//init();
 		DM.loadTransactionChain();
+		GM.makeCharacter("t1", "101001010001011100011111100000000000000000000000000");
 		
 		// 회원가입
 //		GM.signUp("t1", "t2", "t3");
@@ -96,16 +97,20 @@ public class GameManager {
 	}
 
 	public String makeCharacter(String playerId, String DNA) {
+
 		init();
+		
 		DM.loadCharacterChain();
 		Character newCharacter = CharacterChain.makeCharacter(DNA);
+		newCharacter._ownerId = playerId;
+		
 		if(DM.dbHasData) DM.addCharacterChain(newCharacter);
 		else DM.insertCharacterChain();
 		String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
 		
 		// modify Player DB
 		Player p = DM.findPlayer(playerId);
-		p.characterList.add(newCharacter);
+		p.setCharacter(newCharacter);
 		DM.modifyPlayerInfo(p);
 		
 		// insert newCharacter toys DB
@@ -132,11 +137,13 @@ public class GameManager {
 		}
 		
 		Character baby = CharacterChain.breeding(mamaId, papaId);
+		baby._ownerId = playerId;
 		if(DM.dbHasData) DM.addCharacterChain(baby);
 		else DM.insertCharacterChain();
 		DM.addNewCharacter(baby);
 		
 		// transaction 추가하기 (user가 admin에게 send : 수수료)
+		
 		
 		// load Player
 		Player p = DM.findPlayer(playerId);

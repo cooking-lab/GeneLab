@@ -555,6 +555,8 @@ public class DatabaseManager {
         				Updates.set("Players.characterList", characterListJson),
         				Updates.set("Players.hasCharacterNum", p.hasCharacterNum)
         				));
+        
+        System.out.println("Player Info Update Fin!!");
 	}
 	
 	public void signUp(String id, String password, String nickname) {
