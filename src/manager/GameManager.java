@@ -23,21 +23,21 @@ public class GameManager {
 		// db manager 호출
 		init();
 		GM = new GameManager();
-		DM.loadTransactionChain();
-		
+//		DM.loadTransactionChain();
+		GM.makeCharacter("t1", "101001010001011100011111100000000000000000000000000");
 		// 회원가입
 //		GM.signUp("t1", "t2", "t3");
 //		GM.signUp("t4", "t5", "t6");
 				
 		// player Test
-		Player p1 = DM.findPlayer("t1"); // DB에서 load
-		Player p2 = DM.findPlayer("t4");		
+//		Player p1 = DM.findPlayer("t1"); // DB에서 load
+//		Player p2 = DM.findPlayer("t4");		
 //		BlockChain.setCoinToPlayer(p1);
 //		BlockChain.sendCoin(p1, p2, 500);
 //		DM.insertTransactionChain();
 		
-		System.out.println(p1.getBalance());
-		System.out.println(p2.getBalance());
+//		System.out.println(p1.getBalance());
+//		System.out.println(p2.getBalance());
 //		DM.sendCoin("t1", "t4", 500);
 //		doBreeding("00000ac9d93d8cc9a68f75714473b92876f55b4948c5cff9481cf0be6ed69dc1","000007fc85da58e279f4b911634614c3ac4d36dada2063233b13b198bffa49e9");
 //		doBreeding("00000f1943cf20201ef5c9a74a0008a967a6d223f9cbd8e109e044d2589272d2","00000af89132d04b3fab56cfc07b03872e70366c7170816e40e70075d840ba79");
@@ -81,16 +81,20 @@ public class GameManager {
 	}
 
 	public String makeCharacter(String playerId, String DNA) {
+
 		init();
+		
 		DM.loadCharacterChain();
 		Character newCharacter = CharacterChain.makeCharacter(DNA);
+		newCharacter._ownerId = playerId;
+		
 		if(DM.dbHasData) DM.addCharacterChain(newCharacter);
 		else DM.insertCharacterChain();
 		String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
 		
 		// modify Player DB
 		Player p = DM.findPlayer(playerId);
-		p.characterList.add(newCharacter);
+		p.setCharacter(newCharacter);
 		DM.modifyPlayerInfo(p);
 		
 		// insert newCharacter toys DB
@@ -116,11 +120,13 @@ public class GameManager {
 		}
 		
 		Character baby = CharacterChain.breeding(mamaId, papaId);
+		baby._ownerId = playerId;
 		if(DM.dbHasData) DM.addCharacterChain(baby);
 		else DM.insertCharacterChain();
 		DM.addNewCharacter(baby);
 		
 		// transaction 추가하기 (user가 admin에게 send : 수수료)
+		
 		
 		// load Player
 		Player p = DM.findPlayer(playerId);
