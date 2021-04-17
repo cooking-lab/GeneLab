@@ -22,21 +22,22 @@ public class GameManager {
 				
 		// db manager 호출
 
-		//init();
+		init();
 		GameManager gm = new GameManager();
 		
 		// robot
-		gm.makeCharacter("admin", "110101001101010011000000000000000000000000000000000");
-		gm.makeCharacter("admin", "110001001111011011100100100000000000000000000000000");
-		gm.makeCharacter("admin", "100101010001100100001001000000000000000000000000000");
-		gm.makeCharacter("admin", "100001010011010100101101100000000000000000000000000");
+		gm.makeCharacter("t1", "110101001101010011000000000000000000000000000000000");
+		gm.makeCharacter("t1", "110001001111011011100100100000000000000000000000000");
+		gm.makeCharacter("t1", "100101010001100100001001000000000000000000000000000");
+		gm.makeCharacter("t1", "100001010011010100101101100000000000000000000000000");
 		
-		gm.makeCharacter("admin", "111101010101011101010010000000000000000000000000000");
-		gm.makeCharacter("admin", "111001001101100011010110100000000000000000000000000");
-		gm.makeCharacter("admin", "101101001111010011111011000000000000000000000000000");
-		gm.makeCharacter("admin", "101001010001011100011111100000000000000000000000000");
+		gm.makeCharacter("t1", "111101010101011101010010000000000000000000000000000");
+		gm.makeCharacter("t1", "111001001101100011010110100000000000000000000000000");
+		gm.makeCharacter("t1", "101101001111010011111011000000000000000000000000000");
+		gm.makeCharacter("t1", "101001010001011100011111100000000000000000000000000");
+		
 	
-		init();
+		//init();
 		DM.loadTransactionChain();
 		
 		// 회원가입
@@ -44,14 +45,14 @@ public class GameManager {
 //		GM.signUp("t4", "t5", "t6");
 				
 		// player Test
-		Player p1 = DM.findPlayer("t1"); // DB에서 load
-		Player p2 = DM.findPlayer("t4");		
+//		Player p1 = DM.findPlayer("t1"); // DB에서 load
+//		Player p2 = DM.findPlayer("t4");		
 //		BlockChain.setCoinToPlayer(p1);
 //		BlockChain.sendCoin(p1, p2, 500);
 //		DM.insertTransactionChain();
 		
-		System.out.println(p1.getBalance());
-		System.out.println(p2.getBalance());
+//		System.out.println(p1.getBalance());
+//		System.out.println(p2.getBalance());
 //		DM.sendCoin("t1", "t4", 500);
 //		doBreeding("00000ac9d93d8cc9a68f75714473b92876f55b4948c5cff9481cf0be6ed69dc1","000007fc85da58e279f4b911634614c3ac4d36dada2063233b13b198bffa49e9");
 //		doBreeding("00000f1943cf20201ef5c9a74a0008a967a6d223f9cbd8e109e044d2589272d2","00000af89132d04b3fab56cfc07b03872e70366c7170816e40e70075d840ba79");
@@ -141,9 +142,11 @@ public class GameManager {
 		Player p = DM.findPlayer(playerId);
 		p.characterList.add(baby);
 		DM.modifyPlayerInfo(p);
-		
-		String babyString = new GsonBuilder().setPrettyPrinting().create().toJson(baby);
-		return babyString;
+
+//		String babyString = new GsonBuilder().setPrettyPrinting().create().toJson(baby);
+		response2.put("baby", baby);
+		System.out.println(response2);
+		return new GsonBuilder().setPrettyPrinting().create().toJson(response2);
 	}
 	
 	public String getCharacter(String id) {
