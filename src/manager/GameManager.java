@@ -21,7 +21,6 @@ public class GameManager {
 		// TODO Auto-generated method stub
 				
 		// db manager 호출
-
 		init();
 		GameManager gm = new GameManager();
 		
@@ -112,7 +111,7 @@ public class GameManager {
 		// modify Player DB
 		Player p = DM.findPlayer(playerId);
 		p.setCharacter(newCharacter);
-		DM.modifyPlayerInfo(p);
+		DM.modifyPlayerInfo(p, newCharacter);
 		
 		// insert newCharacter toys DB
 		DM.addNewCharacter(newCharacter);
@@ -149,9 +148,9 @@ public class GameManager {
 		// load Player
 		Player p = DM.findPlayer(playerId);
 		p.characterList.add(baby);
-		DM.modifyPlayerInfo(p);
 
 //		String babyString = new GsonBuilder().setPrettyPrinting().create().toJson(baby);
+		DM.modifyPlayerInfo(p, baby);
 		response2.put("baby", baby);
 		
 		return new GsonBuilder().setPrettyPrinting().create().toJson(response2);
