@@ -29,7 +29,7 @@ public class TransactionOutput {
     
 
     // output 내 남아있는 coin이력이 나의 것인지 체크
-    public boolean isMine(PublicKey publicKey) {
-        return (publicKey == reciepient);
+    public boolean isMine(String hash) {
+        return (reciepientHash.equals(hash));
     }
 }
