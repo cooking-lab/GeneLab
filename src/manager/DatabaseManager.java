@@ -148,11 +148,10 @@ public class DatabaseManager {
         doc.append("dna", element.getAsJsonObject().get("_DNA").getAsString());
         doc.append("mamaId", element.getAsJsonObject().get("_mamaId").getAsString());
         doc.append("papaId", element.getAsJsonObject().get("_papaId").getAsString());
-        doc.append("market", null);
+        doc.append("market", false);
         doc.append("adventure", false);
         doc.append("ownerId", element.getAsJsonObject().get("_ownerId").getAsString());
         doc.append("cooltime", 0);
-        doc.append("marketType", "other");
 
         toyCollection.insertOne(doc);
         
@@ -237,7 +236,7 @@ public class DatabaseManager {
         String characterChainString = new GsonBuilder().setPrettyPrinting().create().toJson(CharacterChain.blockchain);
         Object characterChainJson = JSON.parse(characterChainString);
 
-        Document characterChainDocument = new Document("CharacterChain", characterChainJson);        
+        Document characterChainDocument = new Document("CharacterChain", characterChainJson);
         characterChainDocument.append("ChainFilter", "CharacterChain");
         
         Date forRecord = new Date();
@@ -541,20 +540,26 @@ public class DatabaseManager {
 		System.out.println("UTXOs Insert Fin!!");
 	}
 	
-	public void modifyPlayerInfo(Player p) {
+	public void modifyPlayerInfo(Player p, Character newCharacter) {
 		
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB
         MongoCollection<Document> playersCollection = database.getCollection("Players");        
         
-        String characterListString = new GsonBuilder().setPrettyPrinting().create().toJson(p.characterList);
-        Object characterListJson = JSON.parse(characterListString);
+        String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
+        Object newCharacterJson = JSON.parse(newCharacterString);
         
-        playersCollection.updateOne(eq("id", p.id),
+        playersCollection.updateOne(eq("Players.id", p.id),
         		Updates.combine(
         				Updates.set("Players.coin", p.coin),
-        				Updates.set("Players.characterList", characterListJson),
+        				Updates.addToSet("Players.characterList", newCharacterJson),
         				Updates.set("Players.hasCharacterNum", p.hasCharacterNum)
         				));
+        
+        playersCollection.updateOne(
+        		new Document("id", p.id), 
+        		new Document("$set", 
+        				new Document("cuisine", "American (New)"))
+        		.append("$currentDate", new Document("lastModified", true)));
         
         System.out.println("Player Info Update Fin!!");
 	}
@@ -608,6 +613,8 @@ public class DatabaseManager {
         		first();
         
 	    JSONObject jObjectPlayer = new JSONObject(playerDoc).getJSONObject("Players");
+	    
+	    // Object 여러개의 구조로 저장됨
 	    JSONArray jArrayChain = jObjectPlayer.getJSONArray("characterList");
 	    
 	    // load CharacterList of Player
@@ -618,7 +625,7 @@ public class DatabaseManager {
 	        	// get Character value
 	        	String hash = obj.getString("_hash");
 	        	String previousHash = obj.getString("_previousHash");
-	        	long timeStamp = obj.getJSONObject("_timeStamp").getLong("$numberLong");
+	        	long timeStamp = obj.getLong("_timeStamp");
 	        	int nonce = obj.getInt("_nonce");
 	        	String DNA = obj.getString("_DNA");
 	        	String mamaId = obj.getString("_mamaId");

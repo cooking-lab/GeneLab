@@ -23,26 +23,26 @@ public class GameManager {
 		// db manager 호출
 
 		//init();
-		GameManager gm = new GameManager();
+		GM = new GameManager();
 		
 		// robot
-		gm.makeCharacter("admin", "110101001101010011000000000000000000000000000000000");
-		gm.makeCharacter("admin", "110001001111011011100100100000000000000000000000000");
-		gm.makeCharacter("admin", "100101010001100100001001000000000000000000000000000");
-		gm.makeCharacter("admin", "100001010011010100101101100000000000000000000000000");
-		
-		gm.makeCharacter("admin", "111101010101011101010010000000000000000000000000000");
-		gm.makeCharacter("admin", "111001001101100011010110100000000000000000000000000");
-		gm.makeCharacter("admin", "101101001111010011111011000000000000000000000000000");
-		gm.makeCharacter("admin", "101001010001011100011111100000000000000000000000000");
+//		GM.makeCharacter("admin", "110101001101010011000000000000000000000000000000000");
+//		GM.makeCharacter("admin", "110001001111011011100100100000000000000000000000000");
+//		GM.makeCharacter("admin", "100101010001100100001001000000000000000000000000000");
+//		GM.makeCharacter("admin", "100001010011010100101101100000000000000000000000000");
+//		
+//		GM.makeCharacter("admin", "111101010101011101010010000000000000000000000000000");
+//		GM.makeCharacter("admin", "111001001101100011010110100000000000000000000000000");
+//		GM.makeCharacter("admin", "101101001111010011111011000000000000000000000000000");
+//		GM.makeCharacter("admin", "101001010001011100011111100000000000000000000000000");
 	
 		init();
-		DM.loadTransactionChain();
-		GM.makeCharacter("t1", "101001010001011100011111100000000000000000000000000");
+//		DM.loadTransactionChain();
+//		GM.makeCharacter("t4", "101001010001011100011111100000000000000000000000000");
 		
 		// 회원가입
-//		GM.signUp("t1", "t2", "t3");
-//		GM.signUp("t4", "t5", "t6");
+		GM.signUp("t1", "t2", "t3");
+		GM.signUp("t4", "t5", "t6");
 				
 		// player Test
 //		Player p1 = DM.findPlayer("t1"); // DB에서 load
@@ -110,7 +110,7 @@ public class GameManager {
 		// modify Player DB
 		Player p = DM.findPlayer(playerId);
 		p.setCharacter(newCharacter);
-		DM.modifyPlayerInfo(p);
+		DM.modifyPlayerInfo(p, newCharacter);
 		
 		// insert newCharacter toys DB
 		DM.addNewCharacter(newCharacter);
@@ -147,7 +147,7 @@ public class GameManager {
 		// load Player
 		Player p = DM.findPlayer(playerId);
 		p.characterList.add(baby);
-		DM.modifyPlayerInfo(p);
+		DM.modifyPlayerInfo(p, baby);
 		
 		String babyString = new GsonBuilder().setPrettyPrinting().create().toJson(baby);
 		return babyString;
