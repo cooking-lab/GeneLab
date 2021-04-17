@@ -16,7 +16,7 @@ public class Character {
     public String _id; // 본인 ID == hash
     // public float _cooldown; // 쿨타임 (교배 횟수 많을수록 패널티)
     public int _gen; // 지금 몇세대인지 
-    public int _ownerId; // 소유자 id
+    public String _ownerId; // 소유자 id
     
     
     // 0세대 캐릭터의 경우는 유전할때 본인만 참조가능하게.
@@ -32,7 +32,7 @@ public class Character {
     		String papaId,
     		String id,
     		int gen,
-    		int ownerId
+    		String ownerId
     		) {
     	this._hash = hash;
     	this._previousHash = previousHash;

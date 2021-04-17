@@ -107,7 +107,7 @@ public class DatabaseManager {
 	        	String papaId = obj.getString("_papaId");
 	        	String id = obj.getString("_id");
 	        	int gen = obj.getInt("_gen");
-	        	int ownerId = obj.getInt("_ownerId");
+	        	String ownerId = obj.getString("_ownerId");
 	        	
 	        	// add Block
 	        	Character temp = new Character(hash,previousHash,timeStamp,nonce,DNA,mamaId,papaId,id,gen,ownerId);	        	
@@ -555,6 +555,8 @@ public class DatabaseManager {
         				Updates.set("Players.characterList", characterListJson),
         				Updates.set("Players.hasCharacterNum", p.hasCharacterNum)
         				));
+        
+        System.out.println("Player Info Update Fin!!");
 	}
 	
 	public void signUp(String id, String password, String nickname) {
@@ -623,7 +625,7 @@ public class DatabaseManager {
 	        	String papaId = obj.getString("_papaId");
 	        	String id = obj.getString("_id");
 	        	int gen = obj.getInt("_gen");
-	        	int ownerId = obj.getInt("_ownerId");
+	        	String ownerId = obj.getString("_ownerId");
 	        	
 	        	// add CharacterList of Player
 	        	Character temp = new Character(hash,previousHash,timeStamp,nonce,DNA,mamaId,papaId,id,gen,ownerId);	        	
