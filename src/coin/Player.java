@@ -4,17 +4,19 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
 
+import character.Character;
+
 public class Player {
 
-    private String id; // id for login
+    public String id; // id for login
     private String password; // pw for login
     public String nickname; // nickname
     private String introduction;
     private String publicKey;
     private String privateKey;
     public Wallet wallet; // wallet of player
-    private float coin; // coin amount for trading (blockchain)
-    private float stone; // game money for reinforce (?)
+    public float coin; // coin amount for trading (blockchain)
+    public float stone; // game money for reinforce (?)
     public int hasCharacterNum;
     public ArrayList<Character> characterList = new ArrayList<Character>();
 
@@ -30,7 +32,8 @@ public class Player {
     		String privateKey,
     		float coin,
     		float stone,
-    		int hasCharacterNum
+    		int hasCharacterNum,
+    		ArrayList<Character> characterList
     		) {
         this.id = id;
         this.password = password;
@@ -44,6 +47,7 @@ public class Player {
         this.coin = coin;
         this.introduction = introduction;
         this.hasCharacterNum = hasCharacterNum;
+        this.characterList = characterList;
     }
     
     // 새 흘레이어
@@ -87,8 +91,9 @@ public class Player {
         BlockChain.isChainValid();
     }
     
-    public void setCharacter() {
-    	
+    public void setCharacter(Character character) {
+    	characterList.add(character);
+    	hasCharacterNum = characterList.size();
     }
 
     public float getBalance(){
