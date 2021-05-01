@@ -74,6 +74,7 @@ public class DatabaseManager {
         
         MongoCollection<Document> transactionChainListCollection = database.getCollection("TransactionChainList"); // get Collection
         dbHasTransaction = transactionChainListCollection.count() != 0 ? true : false;
+        System.out.println("TransactionChainList 보유 여부 : " + dbHasTransaction);
 	}	
 	
 	// DB로부터 로딩 -> 알고리즘 진행 -> DB 업데이트.
@@ -433,8 +434,7 @@ public class DatabaseManager {
 	        	Block temp = new Block(hash,previousHash,merkleRoot,transactionsLists,timeStamp,nonce);
 	        	BlockChain.blockchain.add(temp);
 	    }
-	    
-	    
+	    	    
 	    
 	    // -----------------------
 	 	// load BlockChain's UTXOs
@@ -478,15 +478,61 @@ public class DatabaseManager {
     		BlockChain.UTXOs.put(transactionIdOfUTXO, tempUTXO);	    	
 	    }
 	    
+	    System.out.println("Transaction Load Fin");
+	    
 	    String a = new GsonBuilder().setPrettyPrinting().create().toJson(BlockChain.blockchain);
 	    System.out.println(a);
-	    
-	    String b = new GsonBuilder().setPrettyPrinting().create().toJson(BlockChain.UTXOs);
-	    System.out.println(b);
 	}
 	
-	public void addTransaction() {
+	public void addTransaction(Block newBlock) {
 		
+		// --------------------------------------------------
+		// about TransactionChain Database
+		// --------------------------------------------------
+				
+		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB
+		MongoCollection<Document> transactionChainListCollection = database.getCollection("TransactionChainList");
+		        
+		String newBlockString = new GsonBuilder().setPrettyPrinting().create().toJson(newBlock);
+		Object newBlockJson = JSON.parse(newBlockString);
+		        
+		transactionChainListCollection.updateOne(Filters.eq("ChainFilter","TransactionChain"),
+		        Updates.addToSet("TransactionChain", newBlockJson));
+		        
+		// --------------------------------------------------
+		// about UTXOs
+		// -------------------------------------------------- 
+		        
+		// UTXO
+		MongoCollection<Document> UTXOsCollection = database.getCollection("UTXOs");
+						
+//		for(int i = 0; i < newBlock._transactions.size(); i++) {
+//			String transactionString = 
+//					new GsonBuilder().setPrettyPrinting().create().toJson(newBlock._transactions.get(i));
+//			System.out.println(transactionString);
+//			Object transactionJson = JSON.parse(transactionString);
+//			UTXOsCollection.updateOne(Filters.eq("ChainFilter", "TransactionChain"),
+//					Updates.addToSet("UTXOs.myArrayList", transactionJson));			
+//		}
+		
+		// update UTXOs
+		int i = 0;
+		JSONArray UTXO = new JSONArray();
+		for(Entry<String, TransactionOutput> kv : BlockChain.UTXOs.entrySet()) {
+			JSONObject inputData = new JSONObject();
+			inputData.put("_transactionId", kv.getKey());
+			inputData.put("_transactionOutput", kv.getValue());
+			UTXO.put(i, inputData);
+			i++;
+		}
+		
+		String UTXOsString = new GsonBuilder().setPrettyPrinting().create().toJson(UTXO);
+		Object UTXOsJson= JSON.parse(UTXOsString);
+
+		UTXOsCollection.updateOne(Filters.eq("UTXOsFilter", "UTXOs"),
+				Updates.set("UTXOs", UTXOsJson));
+		
+		System.out.println("UTXOs add Fin!!");
 	}
 	
 	public void insertTransactionChain() {
@@ -540,8 +586,17 @@ public class DatabaseManager {
 		System.out.println("UTXOs Insert Fin!!");
 	}
 	
-	public void modifyPlayerInfo(Player p, Character newCharacter) {
-		
+	public void updatePlayerCoin(Player p) {
+		// player coin 개수 업데이트
+		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB
+        MongoCollection<Document> playersCollection = database.getCollection("Players");        
+        
+        playersCollection.updateOne(eq("Players.id", p.id),
+        			Updates.set("Players.coin", p.coin));
+	}
+	
+	public void setCharacterToPlayer(Player p, Character newCharacter) {
+		// 새 캐릭터 플레이어 할당
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB
         MongoCollection<Document> playersCollection = database.getCollection("Players");        
         
@@ -562,6 +617,23 @@ public class DatabaseManager {
         		.append("$currentDate", new Document("lastModified", true)));
         
         System.out.println("Player Info Update Fin!!");
+	}
+	
+	public void signUpAdmin(String id, String password, String nickname, String introduction, boolean isAdmin) {
+		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
+        MongoCollection<Document> playerCollection = database.getCollection("Players"); // get Collection  
+
+        Player newPlayer = new Player(id, password, nickname, "", true);
+
+		String newPlayerString = new GsonBuilder().setPrettyPrinting().create().toJson(newPlayer);
+		Object newPlayerJson = JSON.parse(newPlayerString);
+
+		Document characterChainDocument = new Document("Players", newPlayerJson);        
+		characterChainDocument.append("PlayerFilter", "player");
+
+		playerCollection.insertOne(characterChainDocument);
+		
+		System.out.println("Admin SignUp Fin!!");
 	}
 	
 	public void signUp(String id, String password, String nickname) {
@@ -656,16 +728,16 @@ public class DatabaseManager {
 	}
 	
 	
-	public void sendCoin(String send, String to, float value) {
+	public Block sendCoin(String send, String to, float value) {
 		// get Sender Infomation
 		Player S = findPlayer(send);
 //		BlockChain.setCoinToPlayer(S); // test Code
 		
 		// get recipient Infomation
 		Player T = findPlayer(to);
-		BlockChain.sendCoin(S, T, value);
-//		insertPlayer(S);
-//		insertPlayer(T);
+		Block ret = BlockChain.sendCoin(S, T, value);
+		if(ret != null) return ret;
+		else return null;
 	}
 
 	public void test() {

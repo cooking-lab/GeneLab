@@ -66,10 +66,12 @@ public class Player {
 
     // 관리자 생성
     public Player(String id, String password, String nickname, String introduction, boolean isAdmin) {
-        this.id = id;
+    	this.id = id;
         this.password = password;
         this.nickname = nickname;
         this.wallet = new Wallet(); // 지갑 생성
+        this.publicKey = wallet.getStringFromPublicKey();
+        this.privateKey = wallet.getStringFromPrivateKey();
         this.stone = 0;
         this.coin = 0;
         this.introduction = introduction;
