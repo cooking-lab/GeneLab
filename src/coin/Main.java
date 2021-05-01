@@ -5,7 +5,6 @@ import character.CharacterChain;
 public class Main {
     public static void main(String[] args) {
 	// write your code here
-        BlockChain.init(); // BC Library를 사용하기 위한 절차
 //        Player p1 = new Player("testId1","testPw1","testName1");
 //        Player p2 = new Player("testId2","testPw2","testName2");
 //

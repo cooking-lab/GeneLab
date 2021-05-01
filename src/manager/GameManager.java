@@ -9,6 +9,7 @@ import com.mongodb.util.JSON;
 
 import character.Character;
 import character.CharacterChain;
+import coin.Block;
 import coin.BlockChain;
 import coin.Player;
 import gene.geneScience;
@@ -21,7 +22,6 @@ public class GameManager {
 		// TODO Auto-generated method stub
 				
 		// db manager 호출
-
 		//init();
 		GM = new GameManager();
 		
@@ -37,17 +37,22 @@ public class GameManager {
 //		GM.makeCharacter("admin", "101001010001011100011111100000000000000000000000000");
 	
 		init();
-//		DM.loadTransactionChain();
-//		GM.makeCharacter("t4", "101001010001011100011111100000000000000000000000000");
+//		GM.makeCoinPool();
+//		GM.makeCharacter("t1", "110101001101010011000000011111111000000000000000000");
 		
 		// 회원가입
-		GM.signUp("t1", "t2", "t3");
-		GM.signUp("t4", "t5", "t6");
+//		DM.signUpAdmin("YumManager", "YumBarkingAtTheMoon", "Musk", "We Can go to Mars", true);
+		DM.loadTransactionChain();		
+//		GM.signUp("t1", "t2", "t3");
+//		GM.signUp("t4", "t5", "t6");
 				
-		// player Test
-//		Player p1 = DM.findPlayer("t1"); // DB에서 load
-//		Player p2 = DM.findPlayer("t4");		
-//		BlockChain.setCoinToPlayer(p1);
+		// player Test		
+		Player p1 = DM.findPlayer("t1"); // DB에서 load
+//		Player p2 = DM.findPlayer("t4");	
+		Block temp = DM.sendCoin("adminId", p1.id, 300);
+		DM.addTransaction(temp);
+		p1.getBalance();
+		DM.updatePlayerCoin(p1);
 //		BlockChain.sendCoin(p1, p2, 500);
 //		DM.insertTransactionChain();
 		
@@ -67,9 +72,15 @@ public class GameManager {
 		// status 505 : 근친
 	}
 	
+	public void makeCoinPool() {
+		BlockChain.initialSetting();
+		DM.insertPlayer(BlockChain.admin);
+		DM.insertTransactionChain();
+	}
+	
 	public static void init() {
 		BlockChain.onBC();
-//		BlockChain.init(); // BC 모듈 활성화
+//		BlockChain.init();
 		DM = new DatabaseManager("Game", "ChainList");
 	}
 	
@@ -90,13 +101,26 @@ public class GameManager {
 	
 	public void signUp(String id, String password, String nickname) {
 		// init();
-		// DM.loadCharacterChain();
+//		DM.loadTransactionChain();		
 		DM.signUp(id, password, nickname);
-		System.out.println("good");
+		Player newPlayer = DM.findPlayer(id);
+        Player admin = DM.findPlayer("adminId");
+        
+        // 초기 생성 고객에게 500 코인 배정
+        Block temp = BlockChain.sendCoin(admin, newPlayer, 500f);
+        
+        DM.addTransaction(temp);
+        
+        admin.getBalance();
+        newPlayer.getBalance();
+        
+        DM.updatePlayerCoin(newPlayer);
+        DM.updatePlayerCoin(admin);
+        
+		System.out.println("GOOD");
 	}
 
 	public String makeCharacter(String playerId, String DNA) {
-
 		init();
 		
 		DM.loadCharacterChain();
@@ -110,7 +134,7 @@ public class GameManager {
 		// modify Player DB
 		Player p = DM.findPlayer(playerId);
 		p.setCharacter(newCharacter);
-		DM.modifyPlayerInfo(p, newCharacter);
+		DM.setCharacterToPlayer(p, newCharacter);
 		
 		// insert newCharacter toys DB
 		DM.addNewCharacter(newCharacter);
@@ -142,12 +166,16 @@ public class GameManager {
 		DM.addNewCharacter(baby);
 		
 		// transaction 추가하기 (user가 admin에게 send : 수수료)
+		Player admin = DM.findPlayer("adminId");
+		Block block = DM.sendCoin(playerId, "adminId", 0.1f);
+		if(block != null) DM.addTransaction(block);
+		else return null;
+		DM.updatePlayerCoin(admin);
 		
-		
-		// load Player
+		// update Player's info
 		Player p = DM.findPlayer(playerId);
 		p.characterList.add(baby);
-		DM.modifyPlayerInfo(p, baby);
+		DM.setCharacterToPlayer(p, baby);
 		
 		String babyString = new GsonBuilder().setPrettyPrinting().create().toJson(baby);
 		return babyString;
