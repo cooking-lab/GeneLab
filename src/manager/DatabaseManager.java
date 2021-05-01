@@ -82,9 +82,9 @@ public class DatabaseManager {
 		// CharacterChain		
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
         MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection        
-       
+       System.out.println("first : " + CharacterChain.blockchain.size());
        if(!dbHasData || CharacterChain.blockchain.size() != 0) return;
-        
+       System.out.println("second : " + CharacterChain.blockchain.size());
        		// ---------------------
     		// about CharacterChain & Map
     		// ---------------------
