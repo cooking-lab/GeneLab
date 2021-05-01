@@ -176,9 +176,10 @@ public class GameManager {
 		Player p = DM.findPlayer(playerId);
 		p.characterList.add(baby);
 		DM.setCharacterToPlayer(p, baby);
+
+		response2.put("baby", baby);		
 		
-		String babyString = new GsonBuilder().setPrettyPrinting().create().toJson(baby);
-		return babyString;
+		return new GsonBuilder().setPrettyPrinting().create().toJson(response2);
 	}
 	
 	public String getCharacter(String id) {
