@@ -128,8 +128,8 @@ public class geneScience {
 		return result;
 	}
     
-    public String geneMix(String momId, String papaId) {
-       String momGene = CharacterChain.getDna(momId);
+    public String geneMix(String mamaId, String papaId) {
+       String momGene = CharacterChain.getDna(mamaId);
        String papaGene = CharacterChain.getDna(papaId);
        String[] babyArray = new String[traitNum];
        
@@ -172,7 +172,7 @@ public class geneScience {
         	// 조상 살펴야지유
               String genes[] = new String[2];
               for(int j=0; j<2; j++){
-                 String dna = findAncestors(j, j==0 ? momId : papaId, momGene, papaGene);
+                 String dna = findAncestors(j, j==0 ? mamaId : papaId, momGene, papaGene);
                  if(dna == "") {
                     j--;
                     continue;
@@ -185,10 +185,17 @@ public class geneScience {
             	  babyGene = genes[random.nextInt(2)];
               }
               // 눈, 코/입, 열성
-              else if(trait == 5 || trait == 9 || trait == 13) {
+              else if(trait == 5 || trait == 6) {
             	  babyGene = crossover(genes[0], genes[1]);
               }
-              // 색상 (눈, 몸통)
+              // 히든
+              // 유전X 돌연변이에 의해서만 생성
+              else if(trait == 10) {
+            	  String a = mutationPer >= random.nextDouble() ? "1" : "0";
+            	  String b = mutationPer >= random.nextDouble() ? "1" : "0";
+            	  babyGene = a + b;
+              }
+              // 색상 (몸통)
               else {
             	  int[] colorRange = new int[2];
                   for(int i=0; i<2; i++) {
@@ -199,7 +206,7 @@ public class geneScience {
                   babyGene = String.format("%08d", Integer.parseInt(Integer.toBinaryString(colorGene)));
               }
           }
-          System.out.println("아기 유전자 : " +babyGene);
+          System.out.println("아기 유전자 : " + babyGene);
           
           babyArray[trait] = babyGene;
        }
@@ -248,7 +255,7 @@ public class geneScience {
     public String mutation(String gene) {
        StringBuilder mutationGene = new StringBuilder(gene);
        int start = sliceArray[0] + sliceArray[1];
-       int rand = random.nextInt(gene.length()-start) + start;
+       int rand = random.nextInt(gene.length()-start-sliceArray[10]) + start;
        char ch = mutationGene.charAt(rand);
        System.out.println("돌연변이 : "+rand+"번쨰 유전자 "+ch+"->반대로 바뀐다.");
        mutationGene.setCharAt(rand, (ch == '0') ? '1' : '0');

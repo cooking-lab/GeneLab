@@ -81,9 +81,9 @@ public class DatabaseManager {
 		// CharacterChain		
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
         MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection        
-       
+       System.out.println("first : " + CharacterChain.blockchain.size());
        if(!dbHasData || CharacterChain.blockchain.size() != 0) return;
-        
+       System.out.println("second : " + CharacterChain.blockchain.size());
        		// ---------------------
     		// about CharacterChain & Map
     		// ---------------------
@@ -148,7 +148,7 @@ public class DatabaseManager {
         doc.append("dna", element.getAsJsonObject().get("_DNA").getAsString());
         doc.append("mamaId", element.getAsJsonObject().get("_mamaId").getAsString());
         doc.append("papaId", element.getAsJsonObject().get("_papaId").getAsString());
-        doc.append("market", new JSONObject());
+        doc.append("market", null);
         doc.append("adventure", false);
         doc.append("ownerId", element.getAsJsonObject().get("_ownerId").getAsString());
         doc.append("cooltime", 0);
