@@ -47,16 +47,16 @@ public class GameManager {
 		// 회원가입
 //		DM.signUpAdmin("YumManager", "YumBarkingAtTheMoon", "Musk", "We Can go to Mars", true);
 		DM.loadTransactionChain();		
-//		GM.signUp("t1", "t2", "t3");
-//		GM.signUp("t4", "t5", "t6");
+		GM.signUp("t1", "t2", "t3");
+		GM.signUp("t4", "t5", "t6");
 				
 		// player Test		
-		Player p1 = DM.findPlayer("t1"); // DB에서 load
+//		Player p1 = DM.findPlayer("t1"); // DB에서 load
 //		Player p2 = DM.findPlayer("t4");	
-		Block temp = DM.sendCoin("adminId", p1.id, 300);
-		DM.addTransaction(temp);
-		p1.getBalance();
-		DM.updatePlayerCoin(p1);
+//		Block temp = DM.sendCoin("adminId", p1.id, 300);
+//		DM.addTransaction(temp);
+//		p1.getBalance();
+//		DM.updatePlayerCoin(p1);
 //		BlockChain.sendCoin(p1, p2, 500);
 //		DM.insertTransactionChain();
 		
@@ -104,8 +104,8 @@ public class GameManager {
 	}
 	
 	public void signUp(String id, String password, String nickname) {
-		// init();
-//		DM.loadTransactionChain();		
+		init();
+		DM.loadTransactionChain();		
 		DM.signUp(id, password, nickname);
 		Player newPlayer = DM.findPlayer(id);
         Player admin = DM.findPlayer("adminId");
@@ -125,8 +125,7 @@ public class GameManager {
 	}
 
 	public String makeCharacter(String playerId, String DNA) {
-		init();
-		
+		init();		
 		DM.loadCharacterChain();
 		Character newCharacter = CharacterChain.makeCharacter(DNA);
 		newCharacter._ownerId = playerId;
