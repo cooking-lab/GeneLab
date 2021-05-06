@@ -1,6 +1,7 @@
 package manager;
 
 import java.util.HashMap;
+import java.util.Random;
 
 import org.json.JSONObject;
 
@@ -27,15 +28,16 @@ public class GameManager {
 		GameManager gm = new GameManager();
 		gm.signUp("t1", "t2", "t3");
 		// robot
-		gm.makeCharacter("t1", "110101001101010011000000011111111000000000000000000");
-		gm.makeCharacter("t1", "110001001111011011100100100000000000000000000000000");
-		gm.makeCharacter("t1", "100101010001100100001001011000000001010000000111000");
-		gm.makeCharacter("t1", "100001010011010100101101101110000000000100010010000");
-			
-		gm.makeCharacter("t1", "111101010101011101010010000000000000000001111111100");
-		gm.makeCharacter("t1", "111001001101100011010110100000000111111110000000000");
-		gm.makeCharacter("t1", "101101001111010011111011011111111111111111111111100");
-		gm.makeCharacter("t1", "111101001101010011010110011101001100111110000000000");
+//		gm.makeCharacter("t1", "110101001101010011000000011111111000000000000000000");
+//		gm.makeCharacter("t1", "110001001111011011100100100000000000000000000000000");
+//		gm.makeCharacter("t1", "100101010001100100001001011000000001010000000111000");
+//		gm.makeCharacter("t1", "100001010011010100101101101110000000000100010010000");
+//			
+//		gm.makeCharacter("t1", "111101010101011101010010000000000000000001111111100");
+//		gm.makeCharacter("t1", "111001001101100011010110100000000111111110000000000");
+//		gm.makeCharacter("t1", "101101001111010011111011011111111111111111111111100");
+//		gm.makeCharacter("t1", "111101001101010011010110011101001100111110000000000");
+		gm.makeCharacter("t1");
 		
 	//	gm.doBreeding("t1", "00000eb88b1e9629b1889dc4d62eadf520bb1ba93094758482ed66d8c8a1e7e8", "0000042ef68cd2309261489220c56f50dfc12a3ea9d9a3a344d29fe3508583d2");
 		
@@ -104,8 +106,8 @@ public class GameManager {
 	}
 	
 	public void signUp(String id, String password, String nickname) {
-		// init();
-//		DM.loadTransactionChain();		
+		init();
+		DM.loadTransactionChain();		
 		DM.signUp(id, password, nickname);
 		Player newPlayer = DM.findPlayer(id);
         Player admin = DM.findPlayer("adminId");
@@ -123,11 +125,17 @@ public class GameManager {
         
 		System.out.println("GOOD");
 	}
-
-	public String makeCharacter(String playerId, String DNA) {
+	
+	public String makeCharacter(String playerId) {
 		init();
 		
 		DM.loadCharacterChain();
+		long seed = System.currentTimeMillis(); // 1970년 1월 1일부터 현재까지 타임스템프를 가져옵니다.
+		Random random = new Random(seed);
+		geneScience gene = new geneScience();
+		String[] species = { "100", "010", "001" };
+		
+		String DNA = gene.makeGene(species[random.nextInt(3)]);
 		Character newCharacter = CharacterChain.makeCharacter(DNA);
 		newCharacter._ownerId = playerId;
 		
