@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Map.Entry;
 
 import character.Character;
@@ -63,6 +64,7 @@ public class DatabaseManager {
 	private static MongoClient mongoClient; // client
 	public boolean dbHasData = false;
 	public boolean dbHasTransaction = false;
+
 	
 	DatabaseManager(String dbName, String collection) {
 		geneLabDatabaseUri = new MongoClientURI(
@@ -139,7 +141,7 @@ public class DatabaseManager {
     
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(newCharacterString);
-       
+        
         Document doc = new Document();
         doc.append("id", element.getAsJsonObject().get("_id").getAsString());
         doc.append("species", checkSpecies((element.getAsJsonObject().get("_DNA").getAsString()).substring(4, 7)));
