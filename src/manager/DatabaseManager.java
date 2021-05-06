@@ -591,7 +591,7 @@ public class DatabaseManager {
 	public void updatePlayerCoin(Player p) {
 		// player coin 개수 업데이트
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB
-        MongoCollection<Document> playersCollection = database.getCollection("Players");        
+        MongoCollection<Document> playersCollection = database.getCollection("players");        
         
         playersCollection.updateOne(eq("Players.id", p.id),
         			Updates.set("Players.coin", p.coin));
@@ -600,7 +600,7 @@ public class DatabaseManager {
 	public void setCharacterToPlayer(Player p, Character newCharacter) {
 		// 새 캐릭터 플레이어 할당
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB
-        MongoCollection<Document> playersCollection = database.getCollection("Players");        
+        MongoCollection<Document> playersCollection = database.getCollection("players");        
         
         String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
         Object newCharacterJson = JSON.parse(newCharacterString);
@@ -623,7 +623,7 @@ public class DatabaseManager {
 	
 	public void signUpAdmin(String id, String password, String nickname, String introduction, boolean isAdmin) {
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
-        MongoCollection<Document> playerCollection = database.getCollection("Players"); // get Collection  
+        MongoCollection<Document> playerCollection = database.getCollection("players"); // get Collection  
 
         Player newPlayer = new Player(id, password, nickname, "", true);
 
@@ -641,7 +641,7 @@ public class DatabaseManager {
 	public void signUp(String id, String password, String nickname) {
 		
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
-        MongoCollection<Document> playerCollection = database.getCollection("Players"); // get Collection  
+        MongoCollection<Document> playerCollection = database.getCollection("players"); // get Collection  
 
         Player newPlayer = new Player(id, password, nickname, "");
 
@@ -660,7 +660,7 @@ public class DatabaseManager {
 	public void insertPlayer(Player p) {
 		
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
-        MongoCollection<Document> playerCollection = database.getCollection("Players"); // get Collection  
+        MongoCollection<Document> playerCollection = database.getCollection("players"); // get Collection  
 
         //Player newPlayer = new Player(id, password, nickname, "");
 
@@ -679,7 +679,7 @@ public class DatabaseManager {
 	public Player findPlayer(String playerId) {		
 		// findPlayer
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB
-        MongoCollection<Document> playerCollection = database.getCollection("Players");        
+        MongoCollection<Document> playerCollection = database.getCollection("players");        
         
         Document playerDoc = playerCollection.find(
         		eq("Players.id", playerId)).

@@ -26,7 +26,7 @@ public class GameManager {
 
 		init();
 		GameManager gm = new GameManager();
-		gm.signUp("t1", "t2", "t3");
+		//gm.signUp("t1", "t2", "t3");
 		// robot
 //		gm.makeCharacter("t1", "110101001101010011000000011111111000000000000000000");
 //		gm.makeCharacter("t1", "110001001111011011100100100000000000000000000000000");
