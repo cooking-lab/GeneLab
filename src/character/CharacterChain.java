@@ -48,14 +48,6 @@ public class CharacterChain {
         // 조상을 봐야함
         // 몇대를 선택할건지.. 이거 그냥 확률로 먼저 정해 어떤애를 볼건지를 딱 정해
     	// 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트
-    	makeCharacter("111110011111111111111111111111111111111111111111111111111111111111111111111");
-    	makeCharacter("111010011101110111011011111110111111101111111011011111110111111101111111010");
-    	makeCharacter("101110011001100110010011111100111111001111110010011111100111111001111110011");
-    	makeCharacter("101010010001000100000011111000111110001111100000011111000111110001111100010");
-    	makeCharacter("110110011011101110110111110000111100001111000010111110000111100001111000001");
-    	makeCharacter("110010010011001100100111100000111000001110000000111100000111000001110000010");
-    	makeCharacter("100110010111011101101111000000110000001100000001111000000110000001100000000");
-    	makeCharacter("100010001110111011101010000000100000001000000001010000000100000001000000011");
     }
     
     public static void breedTest() {
@@ -73,8 +65,7 @@ public class CharacterChain {
 //       }
     }
     
-    public static Character makeCharacter(String dna) {
-    	
+    public static Character makeCharacter(String playerId, String dna) {    	
     	// 캐릭터 생성시 1루틴
         //ownerCharacterCount.put(userId, 1); // 1대신 user.number 등 .. 혹은 탐색해서 카운트할 수 있게        
         // 클라에서 요청 온 교배 정보의 부모도 추가해야함 parents
@@ -87,7 +78,9 @@ public class CharacterChain {
         blockchain.add(newCharacter);
         blockchain.get(blockchain.size() - 1).generateCharacter(difficulty); // id 생성 시점 
         System.out.println(totalCharacterNum +"번째 캐릭터 생성 중...");
+        newCharacter._ownerId = playerId;
         findCharacter.put(blockchain.get(blockchain.size() - 1)._id, newCharacter); // 이게 겹칠 수 있음.
+        characterToOwner.put(newCharacter._id, newCharacter._ownerId); // 캐릭터 id로 주인 누군지 찾기
         System.out.println("\nBlockchain is Valid: " + isChainValid());
 //        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
 //        System.out.println("\nThe Character Chain: ");

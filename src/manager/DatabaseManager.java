@@ -116,6 +116,9 @@ public class DatabaseManager {
 
 	        	// set Map to breeding
 	        	CharacterChain.findCharacter.put(id, temp);
+	        	
+	        	// set Map character To Owner
+	        	CharacterChain.characterToOwner.put(id, ownerId);
 	        	String[] parentsId = {mamaId, papaId};
 	        	if(mamaId != "" && papaId != "")
 	        		CharacterChain.parents.put(id, parentsId);
@@ -174,11 +177,14 @@ public class DatabaseManager {
         chainListCollection.updateOne(Filters.eq("ChainFilter","CharacterChain"),
         		Updates.addToSet("CharacterChain", newCharacterJson));
         
+        
         // --------------------------------------------------
       	// about mapList(finding parent for breeding) 
       	// -------------------------------------------------- 
         
-        // findCharacter
+        // ----------------------------------------------------
+        // findCharacter(find Character Object using character's ID)
+        // ----------------------------------------------------
         MongoCollection<Document> mapListCollection = database.getCollection("MapList");        
         
         JSONObject findCharacter = new JSONObject();
@@ -191,7 +197,9 @@ public class DatabaseManager {
         mapListCollection.updateOne(Filters.eq("findCharacterFilter","findCharacterMap"),
         		Updates.addToSet("findCharacterMap.myArrayList", findCharacterJson));
         
-        // parents        
+        // ----------------------------------------------------
+        // about parents info(findParentsMap)
+        // ----------------------------------------------------
         if(newCharacter._mamaId != "" && newCharacter._papaId != "") {
             JSONObject findParents = new JSONObject();
         	findParents.put("_babyid", newCharacter._id);
@@ -204,7 +212,21 @@ public class DatabaseManager {
         	mapListCollection.updateOne(Filters.eq("findParentsFilter","findParentsMap"),
         			Updates.addToSet("findParentsMap.myArrayList", findParentsJson));
         }
-                
+        
+        // ----------------------------------------------------
+        // find Owner using character's id (characterToOwner)
+        // ----------------------------------------------------
+        
+        JSONObject characterToOwner = new JSONObject();
+        characterToOwner.put("_characterId", newCharacter._id);
+        characterToOwner.put("_playerId", newCharacter._ownerId);
+        
+        String characterToOwnerString = new GsonBuilder().setPrettyPrinting().create().toJson(characterToOwner);
+        Object characterToOwnerJson = JSON.parse(characterToOwnerString);
+        
+        mapListCollection.updateOne(Filters.eq("characterToOwnerFilter","characterToOwnerMap"),
+        		Updates.addToSet("characterToOwnerMap.myArrayList", characterToOwnerJson));
+        
 	}
 	
 //	public void deleteChain() {
@@ -286,9 +308,26 @@ public class DatabaseManager {
         Document findParentsDoc = new Document("findParentsMap",findParentsJson);
         findParentsDoc.append("findParentsFilter", "findParentsMap");
         mapLists.add(findParentsDoc);
+        
+        // insert CharacterToPlayer Map
+        int k = 0;
+        JSONArray characterToOwnerList = new JSONArray();
+        for(Entry<String, String> kv : CharacterChain.characterToOwner.entrySet()) {
+        	JSONObject inputData = new JSONObject();
+        	inputData.put("_characterId", kv.getKey());
+        	inputData.put("_playerId", kv.getValue());
+        	characterToOwnerList.put(j,inputData);
+        	k++;
+        }
+        
+        String characterToOwnerString = new GsonBuilder().setPrettyPrinting().create().toJson(characterToOwnerList);
+        Object characterToOwnerJson = JSON.parse(characterToOwnerString);
+        Document characterToOwnerDoc = new Document("characterToOwnerMap",characterToOwnerJson);
+        characterToOwnerDoc.append("characterToOwnerFilter", "characterToOwnerMap");
+        mapLists.add(characterToOwnerDoc);
                 
         // save List
-        mapListCollection.insertMany(mapLists);        
+        mapListCollection.insertMany(mapLists); 
 
         // 큰 루틴
         // 1. DB에서 불러오기 (필터) o

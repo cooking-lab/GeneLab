@@ -22,20 +22,20 @@ public class GameManager {
 		// TODO Auto-generated method stub
 				
 		// db manager 호출
-
-		init();
-		GameManager gm = new GameManager();
-		gm.signUp("t1", "t2", "t3");
-		// robot
-		gm.makeCharacter("t1", "110101001101010011000000011111111000000000000000000");
-		gm.makeCharacter("t1", "110001001111011011100100100000000000000000000000000");
-		gm.makeCharacter("t1", "100101010001100100001001011000000001010000000111000");
-		gm.makeCharacter("t1", "100001010011010100101101101110000000000100010010000");
-			
-		gm.makeCharacter("t1", "111101010101011101010010000000000000000001111111100");
-		gm.makeCharacter("t1", "111001001101100011010110100000000111111110000000000");
-		gm.makeCharacter("t1", "101101001111010011111011011111111111111111111111100");
-		gm.makeCharacter("t1", "111101001101010011010110011101001100111110000000000");
+//
+//		init();
+//		GameManager gm = new GameManager();
+//		gm.signUp("t1", "t2", "t3");
+//		// robot
+//		gm.makeCharacter("t1", "110101001101010011000000011111111000000000000000000");
+//		gm.makeCharacter("t1", "110001001111011011100100100000000000000000000000000");
+//		gm.makeCharacter("t1", "100101010001100100001001011000000001010000000111000");
+//		gm.makeCharacter("t1", "100001010011010100101101101110000000000100010010000");
+//			
+//		gm.makeCharacter("t1", "111101010101011101010010000000000000000001111111100");
+//		gm.makeCharacter("t1", "111001001101100011010110100000000111111110000000000");
+//		gm.makeCharacter("t1", "101101001111010011111011011111111111111111111111100");
+//		gm.makeCharacter("t1", "111101001101010011010110011101001100111110000000000");
 		
 	//	gm.doBreeding("t1", "00000eb88b1e9629b1889dc4d62eadf520bb1ba93094758482ed66d8c8a1e7e8", "0000042ef68cd2309261489220c56f50dfc12a3ea9d9a3a344d29fe3508583d2");
 		
@@ -46,9 +46,9 @@ public class GameManager {
 		
 		// 회원가입
 //		DM.signUpAdmin("YumManager", "YumBarkingAtTheMoon", "Musk", "We Can go to Mars", true);
-		DM.loadTransactionChain();		
-		GM.signUp("t1", "t2", "t3");
-		GM.signUp("t4", "t5", "t6");
+//		DM.loadTransactionChain();		
+//		GM.signUp("t1", "t2", "t3");
+//		GM.signUp("t4", "t5", "t6");
 				
 		// player Test		
 //		Player p1 = DM.findPlayer("t1"); // DB에서 load
@@ -97,9 +97,25 @@ public class GameManager {
 //			DM.deleteCharacterChain();
 //		return newCharacterJson;
 //	}
-	
-	
-	public void sellCharacter(String registerId) {
+		
+	public void sellCharacter(String from, String to, float price, String registerId) {
+		init();
+		
+		DM.loadCharacterChain();
+		DM.loadTransactionChain();
+		
+		Player seller = DM.findPlayer(from);
+		Player buyer = DM.findPlayer(to);
+		
+		// 1. 트랜잭션 발생 (코인 전송)
+		Block temp = BlockChain.sendCoin(seller, buyer, price);		
+		DM.addTransaction(temp);
+		
+		// 금액 갱신
+		seller.getBalance();
+		buyer.getBalance();
+		
+		// 2. 캐릭터 전송 (USER DB + CharacterChain Map 수정)
 		
 	}
 	
@@ -127,8 +143,7 @@ public class GameManager {
 	public String makeCharacter(String playerId, String DNA) {
 		init();		
 		DM.loadCharacterChain();
-		Character newCharacter = CharacterChain.makeCharacter(DNA);
-		newCharacter._ownerId = playerId;
+		Character newCharacter = CharacterChain.makeCharacter(playerId, DNA);
 		
 		if(DM.dbHasData) DM.addCharacterChain(newCharacter);
 		else DM.insertCharacterChain();
