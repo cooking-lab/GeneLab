@@ -48,17 +48,17 @@ public class GameManager {
 		
 		// 회원가입
 //		DM.signUpAdmin("YumManager", "YumBarkingAtTheMoon", "Musk", "We Can go to Mars", true);
-		DM.loadTransactionChain();		
+//		DM.loadTransactionChain();		
 //		GM.signUp("t1", "t2", "t3");
 //		GM.signUp("t4", "t5", "t6");
 				
 		// player Test		
-		Player p1 = DM.findPlayer("t1"); // DB에서 load
+//		Player p1 = DM.findPlayer("t1"); // DB에서 load
 //		Player p2 = DM.findPlayer("t4");	
-		Block temp = DM.sendCoin("adminId", p1.id, 300);
-		DM.addTransaction(temp);
-		p1.getBalance();
-		DM.updatePlayerCoin(p1);
+//		Block temp = DM.sendCoin("adminId", p1.id, 300);
+//		DM.addTransaction(temp);
+//		p1.getBalance();
+//		DM.updatePlayerCoin(p1);
 //		BlockChain.sendCoin(p1, p2, 500);
 //		DM.insertTransactionChain();
 		
