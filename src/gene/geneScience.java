@@ -37,7 +37,10 @@ public class geneScience {
     		// 재료1
     		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(6))));
     		// 재료2
-    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(8)+8)));
+    		//newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(8)+8)));
+    		int[] temp = new int[2];
+    		temp[0] = random.nextInt(2)+8; temp[1] = random.nextInt(2)+14;
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(temp[random.nextInt(2)])));
     		// 재료3
     		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(6))));
     		
@@ -45,7 +48,9 @@ public class geneScience {
     		// 재료1
     		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(5)+6)));
     		// 재료2
-    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(8)+8)));
+    		int[] temp = new int[2];
+    		temp[0] = random.nextInt(3)+10; temp[1] = random.nextInt(2)+14;
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(temp[random.nextInt(2)])));
     		// 재료3
     		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(5)+6)));
     		
@@ -53,7 +58,9 @@ public class geneScience {
     		// 재료1
     		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(5)+11)));
     		// 재료2
-    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(8)+8)));
+    		int[] temp = new int[2];
+    		temp[0] = 13; temp[1] = random.nextInt(2)+14;
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(temp[random.nextInt(2)])));
     		// 재료3
     		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(5)+11)));
     		
