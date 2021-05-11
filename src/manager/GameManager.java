@@ -23,9 +23,27 @@ public class GameManager {
 		// TODO Auto-generated method stub
 				
 		// db manager 호출
-		init();
-		GameManager gm = new GameManager();
-	
+//		init();	
+//		GM.makeCoinPool();
+//		DM.signUpAdmin("YumManager", "YumBarkingAtTheMoon", "Musk", "We Can go to Mars", true);
+//		DM.loadTransactionChain();		
+		
+//		GM.signUp("yoonoh123", "YumProject", "Yoonoh");
+//		GM.signUp("t4", "t5", "t6");		
+		
+//		Player p1 = DM.findPlayer("t1"); // DB에서 load
+//		Player p2 = DM.findPlayer("t4");	
+		
+//		Block temp = DM.sendCoin("adminId", p1.id, 300);
+//		DM.addTransaction(temp);
+//		p1.getBalance();
+//		DM.updatePlayerCoin(p1);
+		
+//		BlockChain.sendCoin(p1, p2, 500);
+//		DM.insertTransactionChain();
+
+//		System.out.println(p1.getBalance());
+//		System.out.println(p2.getBalance());
 		// status 200
 		
 		// status 504 : 성별 같음
@@ -46,6 +64,7 @@ public class GameManager {
 		BlockChain.onBC();
 //		BlockChain.init();
 		DM = new DatabaseManager("Game", "ChainList");
+		GM = new GameManager();
 	}
 	
 //	public static String testMakeCharacter(String DNA) {
@@ -71,24 +90,26 @@ public class GameManager {
 		Block temp = BlockChain.sendCoin(seller, buyer, price);		
 		DM.addTransaction(temp);
 		
-		// 금액 갱신
+		// 2. 체인 내 output 기반 금액 갱신
 		seller.getBalance();
 		buyer.getBalance();
 		
-		// 2. 캐릭터 전송 (USER DB + CharacterChain Map 수정)
-		
+		// 3. 캐릭터 전송 (USER DB + CharacterChain Map 수정)
+		DM.sendCharacterToBuyer(seller, buyer, registerId);
 	}
 	
 	public void signUp(String id, String password, String nickname) {
 		init();
 		DM.loadTransactionChain();		
+		
 		DM.signUp(id, password, nickname);
+		
 		Player newPlayer = DM.findPlayer(id);
         Player admin = DM.findPlayer("adminId");
         
         // 초기 생성 고객에게 500 코인 배정
         Block temp = BlockChain.sendCoin(admin, newPlayer, 500f);
-        
+                
         DM.addTransaction(temp);
         
         admin.getBalance();
@@ -97,37 +118,42 @@ public class GameManager {
         DM.updatePlayerCoin(newPlayer);
         DM.updatePlayerCoin(admin);
         
+        GM.makeCharacter(id);
+        
 		System.out.println("GOOD");
 	}
 	
-	public String makeCharacter(String playerId) {
+	// 유저에게 캐릭터 5개 생성
+	public void makeCharacter(String playerId) {
 		init();
 		
 		DM.loadCharacterChain();
-		long seed = System.currentTimeMillis(); // 1970년 1월 1일부터 현재까지 타임스템프를 가져옵니다.
-		Random random = new Random(seed);
-		geneScience gene = new geneScience();
-		String[] species = { "100", "010", "001" };
-
-		String DNA = gene.makeGene(species[random.nextInt(3)]);
-		Character newCharacter = CharacterChain.makeCharacter(playerId, DNA);
-		
-		if(DM.dbHasData) DM.addCharacterChain(newCharacter);
-		else DM.insertCharacterChain();
-		String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
-		
-		// modify Player DB
 		Player p = DM.findPlayer(playerId);
-		p.setCharacter(newCharacter);
-		DM.setCharacterToPlayer(p, newCharacter);
 		
-		// insert newCharacter toys DB
-		DM.addNewCharacter(newCharacter);
-		System.out.println(newCharacterString);
+		for(int i = 0; i < 5; i++) {
+			long seed = System.currentTimeMillis(); // 1970년 1월 1일부터 현재까지 타임스템프를 가져옵니다.
+			Random random = new Random(seed);
+			geneScience gene = new geneScience();
+			String[] species = { "100", "010", "001" };
+
+			String DNA = gene.makeGene(species[random.nextInt(3)]);
 		
-		return newCharacterString;
-	}
-	
+			Character newCharacter = CharacterChain.makeCharacter(playerId, DNA);
+		
+			if(DM.dbHasData) DM.addCharacterChain(newCharacter);
+			else DM.insertCharacterChain();
+			String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
+		
+			// modify Player DB
+			p.setCharacter(newCharacter);
+			DM.setCharacterToPlayer(p, newCharacter);
+		
+			// insert newCharacter toys DB
+			DM.addNewCharacter(newCharacter);
+			System.out.println(newCharacterString);
+		}
+		
+	}	
 
 	public String doBreeding(String playerId, String mamaId, String papaId) {
 		init();
