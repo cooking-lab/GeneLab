@@ -23,6 +23,66 @@ public class geneScience {
     long seed = System.currentTimeMillis(); // 1970년 1월 1일부터 현재까지 타임스템프를 가져옵니다.
     Random random = new Random(seed);
     
+    public String makeGene(String species) {
+    	// 인형 : 100 - 4  로봇 : 010 - 2 자동차 : 001 - 1
+    	String newGene = "1";
+    	// 성별
+    	newGene += String.format("%03d", Integer.parseInt(Integer.toBinaryString(random.nextInt(8))));
+    	
+    	// 종족
+    	newGene += species;
+    
+    	
+    	if(species == "100") {
+    		// 재료1
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(6))));
+    		// 재료2
+    		//newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(8)+8)));
+    		int[] temp = new int[2];
+    		temp[0] = random.nextInt(2)+8; temp[1] = random.nextInt(2)+14;
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(temp[random.nextInt(2)])));
+    		// 재료3
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(6))));
+    		
+    	}else if(species == "010"){
+    		// 재료1
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(5)+6)));
+    		// 재료2
+    		int[] temp = new int[2];
+    		temp[0] = random.nextInt(3)+10; temp[1] = random.nextInt(2)+14;
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(temp[random.nextInt(2)])));
+    		// 재료3
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(5)+6)));
+    		
+    	}else if(species == "001") {
+    		// 재료1
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(5)+11)));
+    		// 재료2
+    		int[] temp = new int[2];
+    		temp[0] = 13; temp[1] = random.nextInt(2)+14;
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(temp[random.nextInt(2)])));
+    		// 재료3
+    		newGene += String.format("%04d", Integer.parseInt(Integer.toBinaryString(random.nextInt(5)+11)));
+    		
+    	}else {
+    		return "";
+    	}
+    	
+    	// 눈, 코/입
+    	newGene += String.format("%03d", Integer.parseInt(Integer.toBinaryString(random.nextInt(8))));
+    	newGene += String.format("%03d", Integer.parseInt(Integer.toBinaryString(random.nextInt(8))));
+    	
+    	// 몸통
+    	for(int i=0; i<3; i++) {
+    		newGene += String.format("%08d", Integer.parseInt(Integer.toBinaryString(random.nextInt(256))));
+    	}
+    	
+    	// 히든
+    	newGene += "00";
+    			
+    	return newGene;
+    }
+    
     public String sliceTrait(String gene, int traitIndx) {
        // sliceArray 앞에서 traitIndx전까지 다 던한 값
        int start = arraySum(traitIndx, sliceArray);
