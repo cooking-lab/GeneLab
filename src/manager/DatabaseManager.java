@@ -807,19 +807,31 @@ public class DatabaseManager {
 	    // from의 CharacterList에서 캐릭터 삭제하기
 	    from.characterList.remove(movedObj);
 	   	    
-
 	    // update Player's database
 	    MongoDatabase gameDatabase = mongoClient.getDatabase("Game"); // get DB
 		MongoCollection<Document> playersCollection = gameDatabase.getCollection("players");  
 		
 		// 두 플레이어의 characterList Update해주기
+		JSONArray fromJArrayChain = new JSONArray();
+		for(int i = 0; i < from.characterList.size(); i++) {
+			String characterStr = new GsonBuilder().setPrettyPrinting().create().toJson(from.characterList.get(i));
+			Object obj = JSON.parse(characterStr);
+			fromJArrayChain.put(i, obj);			
+		}
+		
         playersCollection.updateOne(eq("Players.id", from.id),
-    			Updates.set("Players.characterList", from.characterList));
+    			Updates.set("Players.characterList", fromJArrayChain));
+        
+        JSONArray toJArrayChain = new JSONArray();
+		for(int i = 0; i < to.characterList.size(); i++) {
+			String characterStr = new GsonBuilder().setPrettyPrinting().create().toJson(to.characterList.get(i));
+			Object obj = JSON.parse(characterStr);
+			toJArrayChain.put(i, obj);			
+		}
 
         playersCollection.updateOne(eq("Players.id", to.id),
-    			Updates.set("Players.characterList", to.characterList));
-        
-        
+    			Updates.set("Players.characterList", toJArrayChain));
+                
         // mapList 정보 갱신하기
         MongoCollection<Document> mapListCollection = gameDatabase.getCollection("MapList");  
         

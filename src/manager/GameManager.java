@@ -94,7 +94,11 @@ public class GameManager {
 		seller.getBalance();
 		buyer.getBalance();
 		
-		// 3. 캐릭터 전송 (USER DB + CharacterChain Map 수정)
+		// 3. coin 갱신
+        DM.updatePlayerCoin(seller);
+        DM.updatePlayerCoin(buyer);
+		
+		// 4. 캐릭터 전송 (USER DB + CharacterChain Map 수정)
 		DM.sendCharacterToBuyer(seller, buyer, registerId);
 	}
 	
@@ -151,8 +155,7 @@ public class GameManager {
 			// insert newCharacter toys DB
 			DM.addNewCharacter(newCharacter);
 			System.out.println(newCharacterString);
-		}
-		
+		}		
 	}	
 
 	public String doBreeding(String playerId, String mamaId, String papaId) {
