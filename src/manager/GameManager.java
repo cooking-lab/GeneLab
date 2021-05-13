@@ -29,7 +29,7 @@ public class GameManager {
 //		DM.signUpAdmin("YumManager", "YumBarkingAtTheMoon", "Musk", "We Can go to Mars", true);
 //		DM.loadTransactionChain();
 		
-//		GM.signUp("yoonoh123", "YumProject", "Yoonoh");
+		GM.signUp("yoonoh123", "yoonoh", "yoonoh");
 //		GM.signUp("hyunny", "hyunny", "hyunny");		
 		
 //		Player p1 = DM.findPlayer("t1"); // DB에서 load
