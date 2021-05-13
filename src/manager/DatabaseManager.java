@@ -77,8 +77,21 @@ public class DatabaseManager {
         System.out.println("TransactionChainList 보유 여부 : " + dbHasTransaction);
 	}	
 	
+	public void checkDBState() {
+		geneLabDatabaseUri = new MongoClientURI(
+        		"mongodb://GeneLab:GeneLabPw@lab-shard-00-00.q3vtm.mongodb.net:27017,lab-shard-00-01.q3vtm.mongodb.net:27017,lab-shard-00-02.q3vtm.mongodb.net:27017/Lab?ssl=true&replicaSet=atlas-p8q81q-shard-0&authSource=admin&retryWrites=true&w=majority");
+        mongoClient = new MongoClient(geneLabDatabaseUri);
+		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB		
+        MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection
+        dbHasData = chainListCollection.count() != 0 ? true : false;        
+        
+        MongoCollection<Document> transactionChainListCollection = database.getCollection("TransactionChainList"); // get Collection
+        dbHasTransaction = transactionChainListCollection.count() != 0 ? true : false;
+	}
+	
 	// DB로부터 로딩 -> 알고리즘 진행 -> DB 업데이트.
 	public void loadCharacterChain() {
+		checkDBState();
 		// CharacterChain		
 		MongoDatabase database = mongoClient.getDatabase("Game"); // get DB			   
         MongoCollection<Document> chainListCollection = database.getCollection("ChainList"); // get Collection        
@@ -339,6 +352,7 @@ public class DatabaseManager {
 	
 	// load TransactionChain & Chain's UTXOs 
 	public void loadTransactionChain() {
+		checkDBState();
 		
 	    // ---------------------
 	 	// load TransactionChain
