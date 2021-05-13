@@ -27,13 +27,13 @@ public class GameManager {
 //		GM.sellCharacter("hyunny", "yoonoh123", 200.0f, "17963e11ac3");
 //		GM.makeCoinPool();
 //		DM.signUpAdmin("YumManager", "YumBarkingAtTheMoon", "Musk", "We Can go to Mars", true);
-//		DM.loadTransactionChain();		
+//		DM.loadTransactionChain();
 		
 //		GM.signUp("yoonoh123", "YumProject", "Yoonoh");
-		GM.signUp("hyunny", "hyunny", "hyunny");		
+//		GM.signUp("hyunny", "hyunny", "hyunny");		
 		
 //		Player p1 = DM.findPlayer("t1"); // DB에서 load
-//		Player p2 = DM.findPlayer("t4");	
+//		Player p2 = DM.findPlayer("t4");
 		
 //		Block temp = DM.sendCoin("adminId", p1.id, 300);
 //		DM.addTransaction(temp);
