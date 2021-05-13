@@ -803,25 +803,37 @@ public class DatabaseManager {
 	    
 	    // to의 CharacterList에서 캐릭터 추가하기
 	    to.characterList.add(movedObj);
+	    to.hasCharacterNum = to.characterList.size();
 	    
 	    // from의 CharacterList에서 캐릭터 삭제하기
-	    from.characterList.remove(movedObj);
+	    for(int i = 0; i < from.characterList.size(); i++) {
+	    	if(from.characterList.get(i)._id.equals(toyId)) {
+	    		from.characterList.remove(i);
+	    		break;
+	    	}
+	    }
+	    from.hasCharacterNum = from.characterList.size();
 	   	    
 	    // update Player's database
 	    MongoDatabase gameDatabase = mongoClient.getDatabase("Game"); // get DB
 		MongoCollection<Document> playersCollection = gameDatabase.getCollection("players");  
 		
 		// 두 플레이어의 characterList Update해주기
+		// SELLER
 		JSONArray fromJArrayChain = new JSONArray();
 		for(int i = 0; i < from.characterList.size(); i++) {
 			String characterStr = new GsonBuilder().setPrettyPrinting().create().toJson(from.characterList.get(i));
 			Object obj = JSON.parse(characterStr);
 			fromJArrayChain.put(i, obj);			
 		}
-		
+				
         playersCollection.updateOne(eq("Players.id", from.id),
-    			Updates.set("Players.characterList", fromJArrayChain));
+        		Updates.combine(
+        				Updates.set("Players.characterList", fromJArrayChain),
+        				Updates.set("Players.hasCharacterNum", from.hasCharacterNum)
+        				));
         
+        // BUYER
         JSONArray toJArrayChain = new JSONArray();
 		for(int i = 0; i < to.characterList.size(); i++) {
 			String characterStr = new GsonBuilder().setPrettyPrinting().create().toJson(to.characterList.get(i));
@@ -830,7 +842,10 @@ public class DatabaseManager {
 		}
 
         playersCollection.updateOne(eq("Players.id", to.id),
-    			Updates.set("Players.characterList", toJArrayChain));
+        		Updates.combine(
+        				Updates.set("Players.characterList", toJArrayChain),
+        				Updates.set("Players.hasCharacterNum", to.hasCharacterNum)
+        				));
                 
         // mapList 정보 갱신하기
         MongoCollection<Document> mapListCollection = gameDatabase.getCollection("MapList");  
@@ -868,6 +883,13 @@ public class DatabaseManager {
         mapListCollection.updateOne(eq("characterToOwnerFilter", "characterToOwnerMap"),
         		Updates.set("characterToOwnerMap.myArrayList", characterToOwnerJson));
                		
+        
+		MongoDatabase toyDatabase = mongoClient.getDatabase("Toy"); // get DB
+        MongoCollection<Document> toyCollection = toyDatabase.getCollection("toys");    
+        
+        toyCollection.updateOne(eq("id", movedObj._id),
+        		Updates.set("ownerId", movedObj._ownerId));
+        
 	}
 
 	public void test() {
