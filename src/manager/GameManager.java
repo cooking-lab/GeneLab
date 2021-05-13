@@ -23,13 +23,14 @@ public class GameManager {
 		// TODO Auto-generated method stub
 				
 		// db manager 호출
-//		init();	
+		init();
+//		GM.sellCharacter("hyunny", "yoonoh123", 200.0f, "17963e11ac3");
 //		GM.makeCoinPool();
 //		DM.signUpAdmin("YumManager", "YumBarkingAtTheMoon", "Musk", "We Can go to Mars", true);
 //		DM.loadTransactionChain();		
 		
 //		GM.signUp("yoonoh123", "YumProject", "Yoonoh");
-//		GM.signUp("t4", "t5", "t6");		
+		GM.signUp("hyunny", "hyunny", "hyunny");		
 		
 //		Player p1 = DM.findPlayer("t1"); // DB에서 load
 //		Player p2 = DM.findPlayer("t4");	
@@ -77,7 +78,7 @@ public class GameManager {
 //		return newCharacterJson;
 //	}
 		
-	public void sellCharacter(String from, String to, float price, String registerId) {
+	public boolean sellCharacter(String from, String to, float price, String registerId) {
 		init();
 		
 		DM.loadCharacterChain();
@@ -100,6 +101,8 @@ public class GameManager {
 		
 		// 4. 캐릭터 전송 (USER DB + CharacterChain Map 수정)
 		DM.sendCharacterToBuyer(seller, buyer, registerId);
+		
+		return true;
 	}
 	
 	public void signUp(String id, String password, String nickname) {
