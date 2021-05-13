@@ -657,6 +657,8 @@ public class DatabaseManager {
         String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
         Object newCharacterJson = JSON.parse(newCharacterString);
         
+        p.hasCharacterNum = p.characterList.size();
+        
         playersCollection.updateOne(eq("Players.id", p.id),
         		Updates.combine(
         				Updates.set("Players.coin", p.coin),

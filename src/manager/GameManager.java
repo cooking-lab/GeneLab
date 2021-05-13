@@ -164,6 +164,8 @@ public class GameManager {
 	public String doBreeding(String playerId, String mamaId, String papaId) {
 		init();
 		DM.loadCharacterChain();
+		DM.loadTransactionChain();
+		
 		System.out.println("****************************************");
 		// 교배 가능 여부 판단
 		// 성별, 종족, 근친 여부
@@ -184,15 +186,20 @@ public class GameManager {
 		
 		// transaction 추가하기 (user가 admin에게 send : 수수료)
 		Player admin = DM.findPlayer("adminId");
+		Player p = DM.findPlayer(playerId);
+		
+		// update admin's info
 		Block block = DM.sendCoin(playerId, "adminId", 0.1f);
 		if(block != null) DM.addTransaction(block);
 		else return null;
+		admin.getBalance();
 		DM.updatePlayerCoin(admin);
 		
 		// update Player's info
-		Player p = DM.findPlayer(playerId);
 		p.characterList.add(baby);
 		DM.setCharacterToPlayer(p, baby);
+		p.getBalance();
+		DM.updatePlayerCoin(p);
 
 		response2.put("baby", baby);		
 		
