@@ -151,8 +151,7 @@ public class GameManager {
 			// insert newCharacter toys DB
 			DM.addNewCharacter(newCharacter);
 			System.out.println(newCharacterString);
-		}
-		
+		}		
 	}	
 
 	public String doBreeding(String playerId, String mamaId, String papaId) {
