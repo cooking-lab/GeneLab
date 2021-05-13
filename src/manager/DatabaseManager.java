@@ -802,7 +802,7 @@ public class DatabaseManager {
 	    CharacterChain.characterToOwner.replace(toyId, to.id);
 	    
 	    // to의 CharacterList에서 캐릭터 추가하기
-	    from.characterList.add(movedObj);
+	    to.characterList.add(movedObj);
 	    
 	    // from의 CharacterList에서 캐릭터 삭제하기
 	    from.characterList.remove(movedObj);
