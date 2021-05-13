@@ -146,7 +146,7 @@ public class DatabaseManager {
         Document doc = new Document();
         doc.append("id", element.getAsJsonObject().get("_id").getAsString());
         doc.append("species", checkSpecies((element.getAsJsonObject().get("_DNA").getAsString()).substring(4, 7)));
-        doc.append("name", "testName");
+        //doc.append("name", "testName");
         doc.append("gender", (element.getAsJsonObject().get("_DNA").getAsString()).charAt(2) == '0' ? "male" : "female");
         doc.append("generation",element.getAsJsonObject().get("_gen").getAsInt());
         doc.append("dna", element.getAsJsonObject().get("_DNA").getAsString());
