@@ -914,6 +914,7 @@ public class DatabaseManager {
         toyCollection.updateOne(eq("id", movedObj._id),
         		Updates.set("ownerId", movedObj._ownerId));
         
+        System.out.println("character send fin!");        
 	}
 	
 	public void rentCharacter() {
