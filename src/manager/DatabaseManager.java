@@ -907,6 +907,10 @@ public class DatabaseManager {
         		Updates.set("ownerId", movedObj._ownerId));
         
 	}
+	
+	public void rentCharacter() {
+		
+	}
 
 	public void test() {
 		
