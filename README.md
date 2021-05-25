@@ -9,3 +9,5 @@ Cryptoys BlockChain & Genetic Algorithm
 - [ERC721](https://ethereum.org/en/developers/docs/standards/tokens/erc-721/) NTF Token with Genetic Algorithm
 - [ERC20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) Coin for Token Trading
 
+### 개발 시 요구사항
+- JDK version 1.8

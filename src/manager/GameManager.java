@@ -184,7 +184,7 @@ public class GameManager {
 		init();
 		DM.loadCharacterChain();
 		DM.loadTransactionChain();
-		
+
 		System.out.println("****************************************");
 		// 교배 가능 여부 판단
 		// 성별, 종족, 근친 여부
