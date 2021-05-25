@@ -244,7 +244,7 @@ public class geneScience {
               if(trait >= 2 && trait <= 4) {
             	  babyGene = genes[random.nextInt(2)];
               }
-              // 눈, 코/입, 열성
+              // 눈, 코/입
               else if(trait == 5 || trait == 6) {
             	  babyGene = crossover(genes[0], genes[1]);
               }

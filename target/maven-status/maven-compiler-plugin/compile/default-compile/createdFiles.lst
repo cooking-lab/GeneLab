@@ -1,0 +1,15 @@
+character\Character.class
+character\StringUtil.class
+coin\Transaction.class
+character\CharacterChain.class
+coin\Player.class
+manager\GameManager.class
+coin\StringUtil.class
+coin\Wallet.class
+manager\DatabaseManager.class
+coin\Main.class
+coin\Block.class
+coin\TransactionInput.class
+coin\BlockChain.class
+coin\TransactionOutput.class
+gene\geneScience.class
