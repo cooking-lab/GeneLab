@@ -56,6 +56,9 @@ import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Sorts.ascending; 
 import static java.util.Arrays.asList;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class DatabaseManager {
 	
@@ -68,6 +71,11 @@ public class DatabaseManager {
 		geneLabDatabaseUri = new MongoClientURI(
         		"mongodb://GeneLab:GeneLabPw@lab-shard-00-00.q3vtm.mongodb.net:27017,lab-shard-00-01.q3vtm.mongodb.net:27017,lab-shard-00-02.q3vtm.mongodb.net:27017/Lab?ssl=true&replicaSet=atlas-p8q81q-shard-0&authSource=admin&retryWrites=true&w=majority");
         mongoClient = new MongoClient(geneLabDatabaseUri);
+
+        Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+
+        mongoLogger.setLevel(Level.SEVERE);
+        
 		MongoDatabase database = mongoClient.getDatabase(dbName); // get DB			   
         MongoCollection<Document> chainListCollection = database.getCollection(collection); // get Collection
         dbHasData = chainListCollection.count() != 0 ? true : false;        
