@@ -78,6 +78,10 @@ public class GameManager {
 //		return newCharacterJson;
 //	}
 	
+	public void testFunction() {
+		System.out.println("Test fin");
+	}
+	
 	public boolean sendCharacter(String from, String to, String registerId) {
 		init();
 		
@@ -99,11 +103,11 @@ public class GameManager {
 		DM.loadCharacterChain();
 		DM.loadTransactionChain();
 		
-		Player seller = DM.findPlayer(from);
-		Player buyer = DM.findPlayer(to);
+		Player seller = DM.findPlayer(from);	// 캐릭터 주는 사람 (돈 받아야 할 사람)
+		Player buyer = DM.findPlayer(to);		// 캐릭터 받는 사람 (돈 내야 할 사람)
 		
 		// 1. 트랜잭션 발생 (코인 전송)
-		Block temp = BlockChain.sendCoin(seller, buyer, price);		
+		Block temp = BlockChain.sendCoin(buyer, seller, price);		
 		DM.addTransaction(temp);
 		
 		// 2. 체인 내 output 기반 금액 갱신
