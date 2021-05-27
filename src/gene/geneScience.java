@@ -108,6 +108,7 @@ public class geneScience {
 		if(mamaGene.substring(49, 51)!="00"||papaGene.substring(49, 51)!="00") {
 			res.put("status", 504);
 			res.put("error", "히든 캐릭터는 교배 대상이 아닙니다.");
+			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
 		}
 				
 		// 같은 종족인지
