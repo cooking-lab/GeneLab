@@ -324,9 +324,10 @@ public class geneScience {
     }
     
     public String mutation(String gene) {
+    	// mat2만 mutation
        StringBuilder mutationGene = new StringBuilder(gene);
-       int start = sliceArray[0] + sliceArray[1];
-       int rand = random.nextInt(gene.length()-start-sliceArray[10]) + start;
+       int start = sliceArray[0] + sliceArray[1] + sliceArray[2];
+       int rand = random.nextInt(4) + start;
        char ch = mutationGene.charAt(rand);
        System.out.println("돌연변이 : "+rand+"번쨰 유전자 "+ch+"->반대로 바뀐다.");
        mutationGene.setCharAt(rand, (ch == '0') ? '1' : '0');
