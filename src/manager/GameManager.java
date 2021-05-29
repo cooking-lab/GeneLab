@@ -2,6 +2,7 @@ package manager;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Map.Entry;
 
 import org.json.JSONObject;
 
@@ -23,7 +24,11 @@ public class GameManager {
 		// TODO Auto-generated method stub
 				
 		// db manager 호출
-//		init();
+		init();
+		DM.loadCharacterChain();
+		DM.loadTransactionChain();
+		DM.problemSolve();
+		
 //		GM.sellCharacter("hyunny", "yoonoh123", 200.0f, "17963e11ac3");
 //		GM.makeCoinPool();
 //		DM.signUpAdmin("YumManager", "YumBarkingAtTheMoon", "Musk", "We Can go to Mars", true);

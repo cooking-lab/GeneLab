@@ -111,7 +111,7 @@ public class Wallet {
             TransactionOutput UTXO = item.getValue(); // ->UTXO에서 output 객체 반환
             total += UTXO.value; // transaction output 객체 내 들어있는 Coin 확인
             inputs.add(new TransactionInput(UTXO.id)); // Transaction Input 에 새로운 input으로 생성
-            if(total > value) break; // 내가 보낼 코인의 양 이상이 되면..? break -> 이건 잘 모르겠다
+            if(total > value) break; 
         }
 
         // 위에서 생성된 inputs들을 새 Transaction으로 생성
