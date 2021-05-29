@@ -91,6 +91,9 @@ public class geneScience {
     
 	public String checkBreedingAvailable(String mamaId, String papaId) {
 		JSONObject res = new JSONObject();
+		
+		
+		
 		// 성별 다른지
 		String mamaGene = CharacterChain.findCharacter.get(mamaId)._DNA;
 		String papaGene = CharacterChain.findCharacter.get(papaId)._DNA;
@@ -100,6 +103,14 @@ public class geneScience {
 			res.put("error", "같은 성별은 교배 대상이 아닙니다.");
 			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
 		}
+		
+		//히든인지
+		if(mamaGene.substring(49, 51)!="00"||papaGene.substring(49, 51)!="00") {
+			res.put("status", 504);
+			res.put("error", "히든 캐릭터는 교배 대상이 아닙니다.");
+			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
+		}
+				
 		// 같은 종족인지
 		String mamaSpecies = mamaGene.substring(4,7);
 		String papaSpecies = papaGene.substring(4,7);
@@ -313,9 +324,10 @@ public class geneScience {
     }
     
     public String mutation(String gene) {
+    	// mat2만 mutation
        StringBuilder mutationGene = new StringBuilder(gene);
-       int start = sliceArray[0] + sliceArray[1];
-       int rand = random.nextInt(gene.length()-start-sliceArray[10]) + start;
+       int start = sliceArray[0] + sliceArray[1] + sliceArray[2];
+       int rand = random.nextInt(4) + start;
        char ch = mutationGene.charAt(rand);
        System.out.println("돌연변이 : "+rand+"번쨰 유전자 "+ch+"->반대로 바뀐다.");
        mutationGene.setCharAt(rand, (ch == '0') ? '1' : '0');
