@@ -82,14 +82,14 @@ public class Player {
 
     // 유저간 거래용 함수
     public void sendCoinTo(Player to, float value){
-        System.out.println("\n이전 블럭의 해쉬값 : "+ BlockChain.blockchain.get(BlockChain.blockchain.size() - 1)._hash);
+        System.out.println("\nhash value of previous block : "+ BlockChain.blockchain.get(BlockChain.blockchain.size() - 1)._hash);
         Block block = new Block(BlockChain.blockchain.get(BlockChain.blockchain.size() - 1)._hash);
-        System.out.println("\n"+ this.nickname+ "의 코인 총량 : " + this.wallet.getBalance());
-        System.out.println("\n"+ this.nickname+ "의 지갑에서 "+ to.nickname+" 지갑으로 "+value+" 코인 전송 시도 중...");
+        System.out.println("\n"+ this.nickname+ "'s coin amount : " + this.wallet.getBalance());
+        System.out.println("\n"+ this.nickname+ " send to "+ to.nickname+"'s wallet "+value+" amount coin...");
         block.addTransaction(wallet.sendFunds(to.wallet.publicKey, value)); // 송금
         BlockChain.addBlock(block);
-        System.out.println("\n"+ this.nickname + "의 코인 총량 : " + this.wallet.getBalance());
-        System.out.println("\n"+ to.nickname +"의 코인 총량 : " + to.wallet.getBalance());
+        System.out.println("\n"+ this.nickname + "'s coin : " + this.wallet.getBalance());
+        System.out.println("\n"+ to.nickname +"'s coin : " + to.wallet.getBalance());
         BlockChain.isChainValid();
     }
     

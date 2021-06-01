@@ -100,14 +100,14 @@ public class geneScience {
 		
 		if(mamaGene.charAt(2) == papaGene.charAt(2)) {
 			res.put("status", 504);
-			res.put("error", "같은 성별은 교배 대상이 아닙니다.");
+			res.put("error", "same gender can't breeding.");
 			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
 		}
 		
 		//히든인지
 		if(mamaGene.substring(49, 51)!="00"||papaGene.substring(49, 51)!="00") {
 			res.put("status", 504);
-			res.put("error", "히든 캐릭터는 교배 대상이 아닙니다.");
+			res.put("error", "hidden character can't breeding.");
 			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
 		}
 				
@@ -117,7 +117,7 @@ public class geneScience {
 
 		if(!mamaSpecies.equals(papaSpecies)){
 			res.put("status", 504);
-			res.put("error", "다른 종족은 교배 대상이 아닙니다.");
+			res.put("error", "if the character's species is different, can't breeding.");
 			return new GsonBuilder().setPrettyPrinting().create().toJson(res);
 		}
 		
@@ -153,7 +153,7 @@ public class geneScience {
 					// 5촌 이내 근촌
 					if(mamaObj.getInt("depth") + papaObj.getInt("depth") < 6) {
 						res.put("status", 505);
-						res.put("error", "근친은 교배 대상이 아닙니다.");
+						res.put("error", "near[immediate] relation can't breeding.");
 						res.put("mom_depth", mamaObj.getInt("depth"));
 						res.put("papa_depth", papaObj.getInt("depth"));
 						return new GsonBuilder().setPrettyPrinting().create().toJson(res);
@@ -206,14 +206,14 @@ public class geneScience {
        
        for(int trait = 0; trait<traitNum; trait++) {
     	   System.out.println();
-    	   System.out.println(trait + " 특성");
+    	   System.out.println(trait + " traits");
           // 성별 유전
           String babyGene = "";
           if(trait < 2) {
         	  String momTrait = sliceTrait(momGene, trait);
               String papaTrait = sliceTrait(papaGene, trait);
-              System.out.println(trait + " 엄마 : " + momTrait);
-              System.out.println(trait + " 아빠 : " + papaTrait);
+              System.out.println(trait + " mama : " + momTrait);
+              System.out.println(trait + " papa : " + papaTrait);
               // 성별
               if(trait == 0) {
             	  String momSexGene[] = new String[2];
@@ -233,7 +233,7 @@ public class geneScience {
               // 종족 (그대로 유전, 엄마/아빠 같은 종족임)
               else {
             	  if(!momTrait.equals(papaTrait)) {
-                      System.out.println("종족 다름. 교배 불가");
+                      System.out.println("different species, can't breeding.");
                       return "";
                    }
                    babyGene = momTrait;
@@ -249,7 +249,7 @@ public class geneScience {
                     continue;
                  }
                  genes[j] = sliceTrait(dna, trait);
-                 System.out.println((j==0 ? "엄마" : "아빠")+"(조상) 유전자 : " + genes[j]);
+                 System.out.println((j==0 ? "mama" : "papa")+"(ancestor's) gene : " + genes[j]);
                  }
               // 재료 유전
               if(trait >= 2 && trait <= 4) {
@@ -277,7 +277,7 @@ public class geneScience {
                   babyGene = String.format("%08d", Integer.parseInt(Integer.toBinaryString(colorGene)));
               }
           }
-          System.out.println("아기 유전자 : " + babyGene);
+          System.out.println("baby gene : " + babyGene);
           
           babyArray[trait] = babyGene;
        }
@@ -289,7 +289,7 @@ public class geneScience {
     public String findAncestors(int who, String whoId, String momGene, String papaGene) {
        int ancestorRand = random.nextInt(7) % 8;
         ancestorRand = isExtended(ancestorRand); // -1 ~ 2
-        System.out.println(who+"(0:엄마, 1:아빠) 조상 : " + ancestorRand );
+        System.out.println(who+"(0:mama, 1:papa) ancestor : " + ancestorRand );
         if(ancestorRand == -1) {
            if(who == 0) {return momGene;}
            else {return papaGene;}
@@ -311,10 +311,10 @@ public class geneScience {
             double rand = random.nextDouble();
             // 엄마 유전 (gene1)
             if(rand < crossPer){
-                System.out.print("엄마 ");
+                System.out.print("mama ");
                 newGene += trait1.charAt(i);
             }else{
-                System.out.print("아빠 ");
+                System.out.print("papa ");
                 newGene += trait2.charAt(i);
             }
         }
@@ -329,7 +329,7 @@ public class geneScience {
        int start = sliceArray[0] + sliceArray[1] + sliceArray[2];
        int rand = random.nextInt(4) + start;
        char ch = mutationGene.charAt(rand);
-       System.out.println("돌연변이 : "+rand+"번쨰 유전자 "+ch+"->반대로 바뀐다.");
+       System.out.println("mutation : "+rand+" Gene "+ch+"-> Change it.");
        mutationGene.setCharAt(rand, (ch == '0') ? '1' : '0');
        
        return mutationGene.toString();

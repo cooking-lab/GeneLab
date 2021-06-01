@@ -38,17 +38,17 @@ public class BlockChain {
 
     // 관리자 입장에서 특정 유저에서 특정 유저로 코인 보낼 수 있도록 (관리용)
     public static Block sendCoin(Player from, Player to, float value){
-        System.out.println("\n이전 블럭의 해쉬값 : "+ blockchain.get(blockchain.size() - 1)._hash);
+        System.out.println("\nhash value of previous block : "+ blockchain.get(blockchain.size() - 1)._hash);
         Block block1 = new Block(blockchain.get(blockchain.size() - 1)._hash); // 이전블록에서 잇는 구조
-        System.out.println("\n"+ from.nickname+ "의 코인 총량 : " + from.wallet.getBalance());
-        System.out.println("\n"+ from.nickname+ "의 지갑에서 "+to.nickname+" 지갑으로 "+value+"의 코인 전송 시도 중...");
+        System.out.println("\n"+ from.nickname+ "'s coin amount : " + from.wallet.getBalance());
+        System.out.println("\n"+ from.nickname+ " send to "+to.nickname+"'s wallet "+value+"amount coin...");
         // walletA.sendFunds 함수가 transaction자체를 반환해서 한번에 등록하는 구조
         Transaction temp = from.wallet.sendFunds(to.wallet.publicKey, value);
         if(temp != null)
         	block1.addTransaction(temp); // 송금
         else return null;
-        System.out.println("\n"+ from.nickname + "의 코인 총량 : " + from.wallet.getBalance());
-        System.out.println("\n"+ to.nickname +"의 코인 총량 : " + to.wallet.getBalance());
+        System.out.println("\n"+ from.nickname + "'s coin : " + from.wallet.getBalance());
+        System.out.println("\n"+ to.nickname +"'s coin : " + to.wallet.getBalance());
         addBlock(block1);      
         
         return block1;
@@ -56,15 +56,15 @@ public class BlockChain {
 
     // 초기 플레이어에게 500코인 셋팅
     public static Block setCoinToPlayer(Player player){
-        System.out.println("\n이전 블럭의 해쉬값 : "+ blockchain.get(blockchain.size() - 1)._hash);
+        System.out.println("\nhash value of previous block : "+ blockchain.get(blockchain.size() - 1)._hash);
         Block block1 = new Block(blockchain.get(blockchain.size() - 1)._hash); // 이전블록에서 잇는 구조
-        System.out.println("\n관리자 지갑의 코인 총량 : " + admin.getBalance());
-        System.out.println("\n관리자 지갑에서 플레이어 지갑으로 (500)의 코인 전송 시도 중...");
+        System.out.println("\n's coin amount : " + admin.getBalance());
+        System.out.println("\nadmin send coin to Player (500) now...");
         // walletA.sendFunds 함수가 transaction자체를 반환해서 한번에 등록하는 구조
         Transaction temp = admin.wallet.sendFunds(player.wallet.publicKey, 500f);
         block1.addTransaction(temp); // 송금
-        System.out.println("\n관리자의 코인 총량 : " + admin.getBalance());
-        System.out.println("\n" + player.nickname +"의 코인 총량 : " + player.getBalance());
+        System.out.println("\nadmin's coin amount : " + admin.getBalance());
+        System.out.println("\n" + player.nickname +"'s coin amount : " + player.getBalance());
         addBlock(block1);
         return block1;
     }
@@ -95,7 +95,7 @@ public class BlockChain {
 //        UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0));
 //        admin.getBalance();
         
-        System.out.println("기본 셋팅 완료");
+        System.out.println("basic setting fin");
     }
 
     public static void initialSetting(){              
@@ -118,7 +118,7 @@ public class BlockChain {
 
         UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0));
         admin.getBalance();
-        System.out.println("Genesis Block 생성 중...");
+        System.out.println("Genesis Block generation now...");
 
         Block genesis = new Block("0"); // 첫블럭의 이전블럭은 존재하지 않기에 0
         genesis.addTransaction(genesisTransaction); // 블럭에 Transaction 추가

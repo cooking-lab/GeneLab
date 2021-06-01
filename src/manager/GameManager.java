@@ -24,10 +24,10 @@ public class GameManager {
 		// TODO Auto-generated method stub
 				
 		// db manager 호출
-		init();
-		DM.loadCharacterChain();
-		DM.loadTransactionChain();
-		DM.problemSolve();
+//		init();
+//		DM.loadCharacterChain();
+//		DM.loadTransactionChain();
+//		DM.problemSolve();
 		
 //		GM.sellCharacter("hyunny", "yoonoh123", 200.0f, "17963e11ac3");
 //		GM.makeCoinPool();
