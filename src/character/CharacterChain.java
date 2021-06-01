@@ -77,7 +77,7 @@ public class CharacterChain {
         else newCharacter = new Character(dna, blockchain.get(blockchain.size() - 1)._hash); // 아닐경우                      
         blockchain.add(newCharacter);
         blockchain.get(blockchain.size() - 1).generateCharacter(difficulty); // id 생성 시점 
-        System.out.println(totalCharacterNum +"번째 캐릭터 생성 중...");
+        System.out.println(totalCharacterNum +" character generation now...");
         newCharacter._ownerId = playerId;
         findCharacter.put(blockchain.get(blockchain.size() - 1)._id, newCharacter); // 이게 겹칠 수 있음.
         characterToOwner.put(newCharacter._id, newCharacter._ownerId); // 캐릭터 id로 주인 누군지 찾기
