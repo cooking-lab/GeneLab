@@ -103,8 +103,6 @@ public class Wallet {
         float total = 0;
 
         // Transaction 전체 탐색 -> Transaction Output의 미거래 잔량 도합 체크 = 본인이 보유하고 있는 코인 전체
-        // hashMap.entrySet() -> hashmap 내 포함되어있는 모든 key value 쌍을 출력
-        // ex) map.put(A,1) -> [A=1]의 형태
         for (Map.Entry<String, TransactionOutput> item: UTXOs.entrySet()){
             TransactionOutput UTXO = item.getValue(); // ->UTXO에서 output 객체 반환
             total += UTXO.value; // transaction output 객체 내 들어있는 Coin 확인

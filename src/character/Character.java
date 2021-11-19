@@ -18,7 +18,6 @@ public class Character {
     public int _gen; // 지금 몇세대인지 
     public String _ownerId; // 소유자 id
     
-    
     // 0세대 캐릭터의 경우는 유전할때 본인만 참조가능하게.
     // mama, papa의 경우 빈칸으로 아니면 임의로 정한 값(관리자 지정)
 

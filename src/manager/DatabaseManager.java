@@ -1,6 +1,5 @@
 package manager;
 
-import java.io.IOException;
 import static com.mongodb.client.model.Projections.*;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
@@ -566,15 +565,6 @@ public class DatabaseManager {
 		// UTXO
 		MongoCollection<Document> UTXOsCollection = database.getCollection("UTXOs");
 						
-//		for(int i = 0; i < newBlock._transactions.size(); i++) {
-//			String transactionString = 
-//					new GsonBuilder().setPrettyPrinting().create().toJson(newBlock._transactions.get(i));
-//			System.out.println(transactionString);
-//			Object transactionJson = JSON.parse(transactionString);
-//			UTXOsCollection.updateOne(Filters.eq("ChainFilter", "TransactionChain"),
-//					Updates.addToSet("UTXOs.myArrayList", transactionJson));			
-//		}
-		
 		// update UTXOs
 		int i = 0;
 		JSONArray UTXO = new JSONArray();
@@ -833,6 +823,7 @@ public class DatabaseManager {
 	    		break;
 	    	}
 	    }
+	    
 	    from.hasCharacterNum = from.characterList.size();
 	   	    
 	    // update Player's database
@@ -868,100 +859,6 @@ public class DatabaseManager {
         				Updates.set("Players.hasCharacterNum", to.hasCharacterNum)
         				));
                         
-        // findCharacter의 경우
-        // id값을 비교해서 똑같으면 변경
-        
-        // characterToOwner의 경우
-        // toyId와 비교해서 Owner의 값만 바꿔주면됨
-        
-        // mapList 정보 갱신하기
-//        MongoCollection<Document> mapListCollection = gameDatabase.getCollection("MapList");         
-//        
-//        List<Document> mapLists= new ArrayList<>();        
-//        
-//        // insert findCharacter Map
-//        int i = 0;
-//    	JSONArray allCharacter = new JSONArray();
-//        for(Entry<String, Character> kv : CharacterChain.findCharacter.entrySet()) {
-//        	JSONObject inputData = new JSONObject();
-//        	inputData.put("_id", kv.getKey());
-//        	inputData.put("_character", kv.getValue());
-//        	allCharacter.put(i, inputData);
-//        	i++;
-//        }
-//        
-//        String findCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(allCharacter);
-//        Object findCharacterJson= JSON.parse(findCharacterString);
-//        Document findCharacterDoc = new Document("findCharacterMap", findCharacterJson);
-//        findCharacterDoc.append("findCharacterFilter", "findCharacterMap");
-//        mapLists.add(findCharacterDoc);
-//        
-//        // insert CharacterToOwner Map
-//        int k = 0;
-//        JSONArray characterToOwnerList = new JSONArray();
-//        for(Entry<String, String> kv : CharacterChain.characterToOwner.entrySet()) {
-//        	JSONObject inputData = new JSONObject();
-//        	inputData.put("_characterId", kv.getKey());
-//        	inputData.put("_playerId", kv.getValue());
-//        	characterToOwnerList.put(k, inputData);
-//        	k++;
-//        }
-//        
-//        String characterToOwnerString = new GsonBuilder().setPrettyPrinting().create().toJson(characterToOwnerList);
-//        Object characterToOwnerJson = JSON.parse(characterToOwnerString);
-//        Document characterToOwnerDoc = new Document("characterToOwnerMap",characterToOwnerJson);
-//        characterToOwnerDoc.append("characterToOwnerFilter", "characterToOwnerMap");
-//        mapLists.add(characterToOwnerDoc);
-//        
-//        // 임시
-//        mapListCollection.deleteOne(eq("findCharacterFilter", "findCharacterMap"));
-//        mapListCollection.deleteOne(eq("characterToOwnerFilter", "characterToOwnerMap"));
-//                
-//        // save List
-//        mapListCollection.insertMany(mapLists); 
-        
-//        String movedObjString = new GsonBuilder().setPrettyPrinting().create().toJson(movedObj);
-//        Object movedObjJson= JSON.parse(movedObjString);
-//        
-//        mapListCollection.updateOne(eq("findCharacterMap.myArrayList.map._id", movedObj._id), 
-//        		Updates.set("findCharacterMap.myArrayList.$.map._character", movedObjJson));
-//        
-//        mapListCollection.updateOne(eq("characterToOwnerMap.myArrayList.map._characterId", movedObj._id),
-//        		Updates.set("characterToOwnerMap.myArrayList.$.map._playerId", to.id));
-        
-        // insert findCharacter Map
-//        int i = 0;
-//    	JSONArray allCharacter = new JSONArray();
-//        for(Entry<String, Character> kv : CharacterChain.findCharacter.entrySet()) {
-//        	JSONObject inputData = new JSONObject();
-//        	inputData.put("_id", kv.getKey());
-//        	inputData.put("_character", kv.getValue());
-//        	allCharacter.put(i, inputData);
-//        	i++;
-//        }
-//        
-//        String findCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(allCharacter);
-//        Object findCharacterJson= JSON.parse(findCharacterString);
-//        mapListCollection.updateOne(eq("findCharacterFilter", "findCharacterMap"),
-//        		Updates.set("findCharacterMap", allCharacter));
-//
-//        
-//        // insert CharacterToOwner Map
-//        int k = 0;
-//        JSONArray characterToOwnerList = new JSONArray();
-//        for(Entry<String, String> kv : CharacterChain.characterToOwner.entrySet()) {
-//        	JSONObject inputData = new JSONObject();
-//        	inputData.put("_characterId", kv.getKey());
-//        	inputData.put("_playerId", kv.getValue());
-//        	characterToOwnerList.put(k,inputData);
-//        	k++;
-//        }
-//        
-//        String characterToOwnerString = new GsonBuilder().setPrettyPrinting().create().toJson(characterToOwnerList);
-//        Object characterToOwnerJson = JSON.parse(characterToOwnerString);
-//        mapListCollection.updateOne(eq("characterToOwnerFilter", "characterToOwnerMap"),
-//        		Updates.set("characterToOwnerMap", characterToOwnerList));
-               		        
 		MongoDatabase toyDatabase = mongoClient.getDatabase("Toy"); // get DB
         MongoCollection<Document> toyCollection = toyDatabase.getCollection("toys");    
         

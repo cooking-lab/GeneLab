@@ -23,44 +23,15 @@ public class GameManager {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-//		init();
 		// db manager 호출
 		init();
 		DM.loadCharacterChain();
 		String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(CharacterChain.blockchain.get(44));
 		System.out.println(newCharacterString);
-//		DM.loadTransactionChain();
-		
-//		GM.makeCharacterTestFunction("hyunny");
-//		DM.problemSolve();
-		
-//		GM.sellCharacter("hyunny", "yoonoh123", 200.0f, "17963e11ac3");
-//		GM.makeCoinPool();
-//		DM.signUpAdmin("YumManager", "YumBarkingAtTheMoon", "Musk", "We Can go to Mars", true);
-//		DM.loadTransactionChain();
-		
-//		GM.signUp("yoonoh123", "yoonoh", "yoonoh");
-//		GM.signUp("hyunny", "hyunny", "hyunny");		
-		
-//		Player p1 = DM.findPlayer("conred"); // DB에서 load
-//		Player p2 = DM.findPlayer("royell");
-//		
-//		Block temp = DM.sendCoin("conred", "royell", 30);
-//		DM.addTransaction(temp);
-//		p1.getBalance();
-//		p2.getBalance();
-//		DM.updatePlayerCoin(p1);
-//		DM.updatePlayerCoin(p2);
-		
-//		BlockChain.sendCoin(p1, p2, 500);
-//		DM.insertTransactionChain();
 
-//		System.out.println(p1.getBalance());
-//		System.out.println(p2.getBalance());
 		// status 200
 		
 		// status 504 : 성별 같음
-		//doBreeding("0000088c108ad5762f360c9fef58422ee47fc3e045d649cc7e1909e1609005fe","00000544f4743855726d27179184e1b3bbb9ded18db72ac526da6c4dac9d72f0");
 		
 		// status 504 : 종족 다름
 		
@@ -76,20 +47,9 @@ public class GameManager {
 	
 	public static void init() {
 		BlockChain.onBC();
-//		BlockChain.init();
 		DM = new DatabaseManager("Game", "ChainList");
 		GM = new GameManager();
 	}
-	
-//	public static String testMakeCharacter(String DNA) {
-//		init();
-//		DM.loadCharacterChain();
-//		Character newCharacter = CharacterChain.makeCharacter(DNA);
-//		DM.insertCharacterChain();
-//		if(DM.hasData)
-//			DM.deleteCharacterChain();
-//		return newCharacterJson;
-//	}
 	
 	public void makeCharacterTestFunction(String playerId) {
 		Player p = DM.findPlayer(playerId);
