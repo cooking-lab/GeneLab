@@ -22,11 +22,16 @@ public class GameManager {
 	private static GameManager GM;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-				
-		// db manager 호출
+		
 //		init();
-//		DM.loadCharacterChain();
+		// db manager 호출
+		init();
+		DM.loadCharacterChain();
+		String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(CharacterChain.blockchain.get(44));
+		System.out.println(newCharacterString);
 //		DM.loadTransactionChain();
+		
+//		GM.makeCharacterTestFunction("hyunny");
 //		DM.problemSolve();
 		
 //		GM.sellCharacter("hyunny", "yoonoh123", 200.0f, "17963e11ac3");
@@ -37,13 +42,15 @@ public class GameManager {
 //		GM.signUp("yoonoh123", "yoonoh", "yoonoh");
 //		GM.signUp("hyunny", "hyunny", "hyunny");		
 		
-//		Player p1 = DM.findPlayer("t1"); // DB에서 load
-//		Player p2 = DM.findPlayer("t4");
-		
-//		Block temp = DM.sendCoin("adminId", p1.id, 300);
+//		Player p1 = DM.findPlayer("conred"); // DB에서 load
+//		Player p2 = DM.findPlayer("royell");
+//		
+//		Block temp = DM.sendCoin("conred", "royell", 30);
 //		DM.addTransaction(temp);
 //		p1.getBalance();
+//		p2.getBalance();
 //		DM.updatePlayerCoin(p1);
+//		DM.updatePlayerCoin(p2);
 		
 //		BlockChain.sendCoin(p1, p2, 500);
 //		DM.insertTransactionChain();
@@ -59,6 +66,7 @@ public class GameManager {
 		
 		// status 505 : 근친
 	}
+	
 	
 	public void makeCoinPool() {
 		BlockChain.initialSetting();
@@ -83,8 +91,34 @@ public class GameManager {
 //		return newCharacterJson;
 //	}
 	
-	public void testFunction() {
-		System.out.println("Test fin");
+	public void makeCharacterTestFunction(String playerId) {
+		Player p = DM.findPlayer(playerId);
+		
+		long seed = System.currentTimeMillis(); // 1970년 1월 1일부터 현재까지 타임스템프를 가져옵니다.
+		Random random = new Random(seed);
+		geneScience gene = new geneScience();
+		String[] species = { "100", "010", "001" };
+
+		String DNA = gene.makeGene(species[random.nextInt(3)]);
+		
+		long start = System.currentTimeMillis();
+		Character newCharacter = CharacterChain.makeCharacter(playerId, DNA);		
+		
+		long end = System.currentTimeMillis();
+		
+		System.out.println("캐릭터 생성에 걸린시간 : " + (end-start));
+		
+		if(DM.dbHasData) DM.addCharacterChain(newCharacter);
+		else DM.insertCharacterChain();
+		String newCharacterString = new GsonBuilder().setPrettyPrinting().create().toJson(newCharacter);
+	
+		// modify Player DB
+		p.setCharacter(newCharacter);
+		DM.setCharacterToPlayer(p, newCharacter);
+	
+		// insert newCharacter toys DB
+		DM.addNewCharacter(newCharacter);
+		System.out.println(newCharacterString);
 	}
 	
 	public boolean sendCharacter(String from, String to, String registerId) {
@@ -202,7 +236,7 @@ public class GameManager {
 			return new GsonBuilder().setPrettyPrinting().create().toJson(response2);
 		}
 		
-		Character baby = CharacterChain.breeding(mamaId, papaId);
+		Character baby = CharacterChain.breeding(mamaId, papaId, playerId);
 		baby._ownerId = playerId;
 		if(DM.dbHasData) DM.addCharacterChain(baby);
 		else DM.insertCharacterChain();

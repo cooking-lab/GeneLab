@@ -6,8 +6,8 @@ public class Character {
 
     public String _hash; // 현재 객체의 해쉬값
     public String _previousHash; // 이전 객체의 해쉬값
-    private long _timeStamp; // 현재 시간
-    private int _nonce; // 새 해쉬값을 찾기 위해 증가하는 값
+    public long _timeStamp; // 현재 시간
+    public int _nonce; // 새 해쉬값을 찾기 위해 증가하는 값
 
     // character 속성
     public String _DNA; // DNA
@@ -50,9 +50,25 @@ public class Character {
         this._DNA = DNA;
         this._previousHash = previousHash;
         this._timeStamp = new Date().getTime();
-        this._hash = calculateHash();
         this._mamaId = "";
         this._papaId = "";
+        this._gen = 0;
+        this._hash = calculateHash();
+    }
+    
+    public Character(String DNA, 
+    		String previousHash,
+    		String mamaId,
+    		String papaId,
+    		int gen
+    		) { // 새 캐릭터 생성
+        this._DNA = DNA;
+        this._previousHash = previousHash;
+        this._timeStamp = new Date().getTime();
+        this._mamaId = mamaId;
+        this._papaId = papaId;
+        this._gen = gen;
+        this._hash = calculateHash();
     }
     
     public void setParents(String mama, String papa) {

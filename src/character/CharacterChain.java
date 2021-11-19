@@ -51,18 +51,7 @@ public class CharacterChain {
     }
     
     public static void breedTest() {
-       for(int i = 0; i < 4; i++) {
-    	   breeding(blockchain.get(2*i)._id,blockchain.get(2*i+1)._id);
-       }
-       for(int i = 4; i < 6; i++) {
-    	   breeding(blockchain.get(2*i)._id,blockchain.get(2*i+1)._id);
-       }
-       for(int i = 6; i < 7; i++) {
-    	   breeding(blockchain.get(2*i)._id,blockchain.get(2*i+1)._id);
-       }
-//       for(int i = 14; i < 15; i++) {
-//    	   breeding(blockchain.get(2*i)._Id,blockchain.get(2*i+1)._Id);
-//       }
+       
     }
     
     public static Character makeCharacter(String playerId, String dna) {    	
@@ -73,31 +62,35 @@ public class CharacterChain {
         //parents.put("결과물의 id", breedingNow);
     	totalCharacterNum++;
         Character newCharacter;
-        if(blockchain.size() == 0) newCharacter = new Character(dna,"0"); // 초기 캐릭터일 경우
-        else newCharacter = new Character(dna, blockchain.get(blockchain.size() - 1)._hash); // 아닐경우                      
+        if(blockchain.size() == 0) newCharacter = new Character(dna,"0","","",0); // 초기 캐릭터일 경우
+        else newCharacter = new Character(dna, blockchain.get(blockchain.size() - 1)._hash, "", "", 0); // 아닐경우                      
         blockchain.add(newCharacter);
         blockchain.get(blockchain.size() - 1).generateCharacter(difficulty); // id 생성 시점 
         System.out.println(totalCharacterNum +" character generation now...");
         newCharacter._ownerId = playerId;
         findCharacter.put(blockchain.get(blockchain.size() - 1)._id, newCharacter); // 이게 겹칠 수 있음.
         characterToOwner.put(newCharacter._id, newCharacter._ownerId); // 캐릭터 id로 주인 누군지 찾기
+        System.out.println("DNA : " + newCharacter._DNA);
+        System.out.println("ID : " + newCharacter._id);
+        System.out.println("nonce : " + newCharacter._nonce);
         System.out.println("\nBlockchain is Valid: " + isChainValid());
 //        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
 //        System.out.println("\nThe Character Chain: ");
 //        System.out.println(blockchainJson);
-        System.out.println("MakeCharacter is Finished!");
+        System.out.println("Make Character is Finished!");
         return newCharacter;
     }
     
     // 엄마, 아빠 순으로 id를 받아옴
-    public static Character breeding(String female, String male) {
+    public static Character breeding(String female, String male, String playerId) {
         geneScience gene = new geneScience();
         System.out.println(findCharacter.get(female)._DNA);
         System.out.println(findCharacter.get(male)._DNA);
         String babyDna = gene.geneMix(findCharacter.get(female)._id, findCharacter.get(male)._id);
-    	Character newCharacter = new Character(babyDna, blockchain.get(blockchain.size() - 1)._hash); // 새 캐릭터 생성
-    	newCharacter.setParents(female, male);
-    	newCharacter.setGeneration(Math.max(findCharacter.get(female)._gen, findCharacter.get(male)._gen) + 1);
+    	Character newCharacter = new Character(babyDna, 
+    			blockchain.get(blockchain.size() - 1)._hash, 
+    			female, male, 
+    			Math.max(findCharacter.get(female)._gen, findCharacter.get(male)._gen) + 1); // 새 캐릭터 생성
     	String[] tempParent = {female, male}; // 엄마, 아빠 순    	
         blockchain.add(newCharacter); //체인에 부착
         blockchain.get(blockchain.size() - 1).generateCharacter(difficulty); // 해쉬값 생성 (블록에 붙은 시점

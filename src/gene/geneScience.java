@@ -105,7 +105,7 @@ public class geneScience {
 		}
 		
 		//히든인지
-		if(mamaGene.substring(49, 51)!="00"||papaGene.substring(49, 51)!="00") {
+		if(!mamaGene.substring(49, 51).equals("00") || !papaGene.substring(49, 51).equals("00")) {
 			res.put("status", 504);
 			res.put("error", "hidden character can't breeding.");
 			return new GsonBuilder().setPrettyPrinting().create().toJson(res);

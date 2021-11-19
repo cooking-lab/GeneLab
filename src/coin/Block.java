@@ -58,6 +58,7 @@ public class Block {
             _nonce++;
             _hash = calculateHash();
         }
+        System.out.println("_merkleRoot : " + _merkleRoot);
         System.out.println("Block Mined!!! : " + _hash);
     }
 

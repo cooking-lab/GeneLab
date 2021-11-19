@@ -41,7 +41,6 @@ public class Wallet {
     		byte[] pubDecoded = StringUtil.getKeyFromString(pub);
         	X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(pubDecoded);
         	KeyFactory pubFactory = KeyFactory.getInstance("ECDSA");
-        	System.out.println("publicKey Decoding");
         	this.publicKey = pubFactory.generatePublic(pubSpec);
     	}
         catch(Exception e) {
@@ -54,7 +53,6 @@ public class Wallet {
     		byte[] priDecoded = StringUtil.getKeyFromString(pri);
             PKCS8EncodedKeySpec priSpec = new PKCS8EncodedKeySpec(priDecoded);
             KeyFactory priFactory = KeyFactory.getInstance("ECDSA");
-            System.out.println("privateKey Decoding");
             this.privateKey = priFactory.generatePrivate(priSpec);
     	}
         catch(Exception e) {

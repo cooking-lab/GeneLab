@@ -4,6 +4,8 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.google.gson.GsonBuilder;
+
 public class BlockChain {
 
 	// BlockChain
@@ -41,14 +43,19 @@ public class BlockChain {
         System.out.println("\nhash value of previous block : "+ blockchain.get(blockchain.size() - 1)._hash);
         Block block1 = new Block(blockchain.get(blockchain.size() - 1)._hash); // 이전블록에서 잇는 구조
         System.out.println("\n"+ from.nickname+ "'s coin amount : " + from.wallet.getBalance());
+        System.out.println("\n"+ to.nickname+ "'s coin amount : " + to.wallet.getBalance());
         System.out.println("\n"+ from.nickname+ " send to "+to.nickname+"'s wallet "+value+"amount coin...");
         // walletA.sendFunds 함수가 transaction자체를 반환해서 한번에 등록하는 구조
         Transaction temp = from.wallet.sendFunds(to.wallet.publicKey, value);
         if(temp != null)
         	block1.addTransaction(temp); // 송금
         else return null;
+        System.out.println("Transaction ID : " + temp.transactionId);
+        System.out.println("Sender's Public Key (Encoded) : " + temp.senderHash);
+        System.out.println("Receiver's Public Key (Encoded) : " + temp.reciepientHash);
         System.out.println("\n"+ from.nickname + "'s coin : " + from.wallet.getBalance());
         System.out.println("\n"+ to.nickname +"'s coin : " + to.wallet.getBalance());
+        System.out.println();
         addBlock(block1);      
         
         return block1;
@@ -129,6 +136,11 @@ public class BlockChain {
     public static void addBlock(Block newBlock) {
         newBlock.mineBlock(difficulty);
         blockchain.add(newBlock);
+        System.out.println("\"_hash\" : "+ newBlock._hash);
+        System.out.println("\"_previousHash\" : "+ newBlock._previousHash);
+        System.out.println("\"_merkleRoot\" : "+ newBlock._merkleRoot);
+        System.out.println("\"_timeStamp\" : "+ newBlock._timeStamp);
+        System.out.println("\"_nonce\" : "+ newBlock._nonce);
         isChainValid();
     }
 
