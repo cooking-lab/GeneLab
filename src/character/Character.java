@@ -6,8 +6,8 @@ public class Character {
 
     public String _hash; // 현재 객체의 해쉬값
     public String _previousHash; // 이전 객체의 해쉬값
-    private long _timeStamp; // 현재 시간
-    private int _nonce; // 새 해쉬값을 찾기 위해 증가하는 값
+    public long _timeStamp; // 현재 시간
+    public int _nonce; // 새 해쉬값을 찾기 위해 증가하는 값
 
     // character 속성
     public String _DNA; // DNA
@@ -17,7 +17,6 @@ public class Character {
     // public float _cooldown; // 쿨타임 (교배 횟수 많을수록 패널티)
     public int _gen; // 지금 몇세대인지 
     public String _ownerId; // 소유자 id
-    
     
     // 0세대 캐릭터의 경우는 유전할때 본인만 참조가능하게.
     // mama, papa의 경우 빈칸으로 아니면 임의로 정한 값(관리자 지정)
@@ -50,9 +49,25 @@ public class Character {
         this._DNA = DNA;
         this._previousHash = previousHash;
         this._timeStamp = new Date().getTime();
-        this._hash = calculateHash();
         this._mamaId = "";
         this._papaId = "";
+        this._gen = 0;
+        this._hash = calculateHash();
+    }
+    
+    public Character(String DNA, 
+    		String previousHash,
+    		String mamaId,
+    		String papaId,
+    		int gen
+    		) { // 새 캐릭터 생성
+        this._DNA = DNA;
+        this._previousHash = previousHash;
+        this._timeStamp = new Date().getTime();
+        this._mamaId = mamaId;
+        this._papaId = papaId;
+        this._gen = gen;
+        this._hash = calculateHash();
     }
     
     public void setParents(String mama, String papa) {

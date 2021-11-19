@@ -86,7 +86,6 @@ public class StringUtil {
     		byte[] pubDecoded = StringUtil.getKeyFromString(string);
         	X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(pubDecoded);
         	KeyFactory pubFactory = KeyFactory.getInstance("ECDSA", "BC");
-        	System.out.println("publicKey Decoding");
         	publicKey = pubFactory.generatePublic(pubSpec);
     	}
         catch(Exception e) {
@@ -101,7 +100,6 @@ public class StringUtil {
     		byte[] priDecoded = StringUtil.getKeyFromString(string);
             PKCS8EncodedKeySpec priSpec = new PKCS8EncodedKeySpec(priDecoded);
             KeyFactory priFactory = KeyFactory.getInstance("ECDSA", "BC");
-            System.out.println("privateKey Decoding");
             privateKey = priFactory.generatePrivate(priSpec);
     	}
         catch(Exception e) {
